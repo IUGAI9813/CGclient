@@ -1,65 +1,124 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+import ConsoleLayout from "./components/ConsoleLayout";
+import DashboardView from "./components/views/DashboardView";
+import IncidentsView from "./components/views/IncidentsView";
+import FleetView from "./components/views/FleetView";
+import AuditView from "./components/views/AuditView";
+import SettingsView from "./components/views/SettingsView";
+
+interface Incident {
+  id: string;
+  vehicleId: string;
+  type: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "INFO";
+  status: "ACTIVE" | "TRIAGED" | "RESOLVED";
+  timestamp: string;
+  description: string;
+}
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [threatLevel, setThreatLevel] = useState<"NORMAL" | "ELEVATED" | "CRITICAL">("ELEVATED");
+  const [panicMode, setPanicMode] = useState<boolean>(false);
+  const [selectedIncidentFromDashboard, setSelectedIncidentFromDashboard] = useState<Incident | null>(null);
+
+  // Initial Incidents State
+  const [incidents, setIncidents] = useState<Incident[]>([
+    { 
+      id: "INC-2026-9812", 
+      vehicleId: "VEH-42-012", 
+      type: "CAN Bus Injection Suspected", 
+      severity: "CRITICAL", 
+      status: "ACTIVE", 
+      timestamp: "2 min ago",
+      description: "OB-CAN monitor logged anomalous frame ID 0x0A2 with speed data overrides while transmission state reported zero movement. Injection origin suspected: Telematics cell transmitter gateway."
+    },
+    { 
+      id: "INC-2026-9811", 
+      vehicleId: "VEH-42-089", 
+      type: "LiDAR Blockage / Tamper Anomaly", 
+      severity: "HIGH", 
+      status: "ACTIVE", 
+      timestamp: "4 min ago",
+      description: "Optical feedback on front LiDAR transceiver reported sudden zero return signal strength, which contradicts LiDAR frame parity checks. Diagnostic code suggests physical obstruction or laser emitter fault."
+    },
+    { 
+      id: "INC-2026-9810", 
+      vehicleId: "VEH-42-005", 
+      type: "Unauthorized Port Binding", 
+      severity: "HIGH", 
+      status: "TRIAGED", 
+      timestamp: "20 min ago",
+      description: "Security wrapper detected binding of port 8088 to external socket interface on central processor partition A. Connection terminated immediately by secure firewall ruleset."
+    },
+    { 
+      id: "INC-2026-9809", 
+      vehicleId: "VEH-42-104", 
+      type: "GPS Spoofing Attempt Blocked", 
+      severity: "MEDIUM", 
+      status: "RESOLVED", 
+      timestamp: "1 hour ago",
+      description: "Pseudorange consistency check detected multi-path discrepancies indicating fake GPS signal broadcast. System fallback to Inertial Navigation System (INS) completed safely."
+    }
+  ]);
+
+  const activeIncidentsCount = incidents.filter(i => i.status === "ACTIVE").length;
+
+  const handleDashboardNavigate = (tab: string, itemData?: any) => {
+    if (itemData) {
+      setSelectedIncidentFromDashboard(itemData);
+    }
+    setActiveTab(tab);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <DashboardView 
+            onNavigateToTab={handleDashboardNavigate} 
+            incidents={incidents}
+            panicMode={panicMode}
+          />
+        );
+      case "incidents":
+        return (
+          <IncidentsView 
+            incidents={incidents} 
+            setIncidents={setIncidents}
+            selectedIncidentFromDashboard={selectedIncidentFromDashboard}
+            clearSelectedIncidentFromDashboard={() => setSelectedIncidentFromDashboard(null)}
+            panicMode={panicMode}
+          />
+        );
+      case "fleet":
+        return <FleetView panicMode={panicMode} />;
+      case "audit":
+        return <AuditView />;
+      case "settings":
+        return <SettingsView />;
+      default:
+        return (
+          <div className="flex items-center justify-center h-64 text-zinc-500 font-mono">
+            UNDER CONSTRUCTION // SECTION NOT IMPLEMENTED
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <ConsoleLayout
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      threatLevel={threatLevel}
+      setThreatLevel={setThreatLevel}
+      panicMode={panicMode}
+      setPanicMode={setPanicMode}
+      incidentCount={activeIncidentsCount}
+    >
+      {renderContent()}
+    </ConsoleLayout>
   );
 }

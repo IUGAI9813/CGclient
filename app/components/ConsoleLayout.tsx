@@ -16,7 +16,9 @@ import {
   ChevronRight, 
   MapPin, 
   Lock,
-  Database
+  Database,
+  Network,
+  KeyRound
 } from "lucide-react";
 
 interface ConsoleLayoutProps {
@@ -59,10 +61,12 @@ export default function ConsoleLayout({
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: Activity, badge: null },
+    { id: "gateway", label: "API Gateway (Tyk)", icon: Network, badge: "6/6 UP", badgeColor: "bg-brand-emerald" },
+    { id: "iam", label: "IAM & OAuth 2.0", icon: KeyRound, badge: "OIDC", badgeColor: "bg-brand-cyan" },
     { id: "incidents", label: "Incidents & Alerts", icon: AlertTriangle, badge: incidentCount > 0 ? incidentCount : null, badgeColor: "bg-brand-rose" },
     { id: "fleet", label: "Fleet & Devices", icon: Compass, badge: "148/150", badgeColor: "bg-brand-cyan" },
     { id: "audit", label: "Audit Trail", icon: FileText, badge: null },
-    { id: "settings", label: "System & Access", icon: Settings, badge: null },
+    { id: "settings", label: "System & ABAC", icon: Settings, badge: null },
   ];
 
   return (

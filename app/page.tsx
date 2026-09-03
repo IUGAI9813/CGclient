@@ -7,6 +7,8 @@ import IncidentsView from "./components/views/IncidentsView";
 import FleetView from "./components/views/FleetView";
 import AuditView from "./components/views/AuditView";
 import SettingsView from "./components/views/SettingsView";
+import GatewayView from "./components/views/GatewayView";
+import IamAuthView from "./components/views/IamAuthView";
 
 interface Incident {
   id: string;
@@ -83,6 +85,10 @@ export default function Home() {
             panicMode={panicMode}
           />
         );
+      case "gateway":
+        return <GatewayView />;
+      case "iam":
+        return <IamAuthView />;
       case "incidents":
         return (
           <IncidentsView 

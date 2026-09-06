@@ -14,7 +14,9 @@ import {
   RefreshCw,
   Trash2,
   Sliders,
-  Activity
+  Activity,
+  FileCode,
+  Code
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 
@@ -336,6 +338,18 @@ export default function SettingsView() {
         >
           <Key className="w-4 h-4 text-brand-cyan" />
           <span>{t("settings.tab_api")}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab("abac")}
+          className={`w-full text-left p-3 rounded font-mono text-xs border transition-all flex items-center gap-2.5 ${
+            activeSubTab === "abac"
+              ? "bg-zinc-900 border-brand-cyan text-white font-bold"
+              : "bg-transparent text-zinc-400 border-panel-border hover:bg-zinc-900/50 hover:text-white"
+          }`}
+        >
+          <FileCode className="w-4 h-4 text-brand-cyan" />
+          <span>ABAC & OPA Policy Engine</span>
         </button>
 
         <button
@@ -1220,6 +1234,101 @@ export default function SettingsView() {
                 className="px-3 py-1.5 rounded bg-brand-cyan hover:bg-brand-cyan/90 text-black text-[10px] font-bold uppercase transition-all"
               >
                 {language === "ko" ? "정책 규칙 배포" : "DEPLOY POLICY RULES"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ABAC & OPA (Open Policy Agent) Policy Engine */}
+        {activeSubTab === "abac" && (
+          <div className="cyber-panel p-4 rounded space-y-4">
+            <div className="border-b border-panel-border pb-3 flex justify-between items-center">
+              <div>
+                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Policy-as-Code Engine</span>
+                <h2 className="text-sm font-bold text-white mt-1">Attribute-Based Access Control (ABAC & Rego)</h2>
+              </div>
+              <span className="text-[10px] text-brand-emerald font-bold border border-brand-emerald/30 bg-brand-emerald/10 px-2 py-0.5 rounded">
+                OPA v0.68 COMPILED
+              </span>
+            </div>
+
+            {/* ABAC Rules Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-3.5 bg-zinc-950/60 border border-panel-border rounded space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-bold text-white">POL-01: Emergency Braking Overrides</span>
+                  <span className="text-[9px] px-1.5 py-0.5 bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/30 rounded font-bold">ACTIVE</span>
+                </div>
+                <p className="text-[10px] text-zinc-400 font-mono">
+                  Allow <span className="text-brand-cyan">POST /v1/fleet/control/emergency-stop</span> ONLY IF:
+                </p>
+                <div className="space-y-1 text-[10px] text-zinc-400 font-mono bg-zinc-900/60 p-2 rounded border border-panel-border">
+                  <div>• Subject: <span className="text-zinc-200">role == 'DISPATCHER' && mfa == true</span></div>
+                  <div>• Environment: <span className="text-zinc-200">location == 'Gangnam_SOC'</span></div>
+                  <div>• Resource: <span className="text-zinc-200">vehicle.state in ['AUTONOMOUS_RUN', 'EMERGENCY']</span></div>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-zinc-950/60 border border-panel-border rounded space-y-2">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-bold text-white">POL-02: Direct OB-CAN Streaming</span>
+                  <span className="text-[9px] px-1.5 py-0.5 bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/30 rounded font-bold">ACTIVE</span>
+                </div>
+                <p className="text-[10px] text-zinc-400 font-mono">
+                  Allow <span className="text-brand-cyan">gRPC /v1/can-bus/stream</span> ONLY IF:
+                </p>
+                <div className="space-y-1 text-[10px] text-zinc-400 font-mono bg-zinc-900/60 p-2 rounded border border-panel-border">
+                  <div>• Subject: <span className="text-zinc-200">clearance &gt;= 3 && pki_cert == 'VALID'</span></div>
+                  <div>• Environment: <span className="text-zinc-200">time_window == 'MAINTENANCE_HOURS' || threat == 'CRITICAL'</span></div>
+                  <div>• Resource: <span className="text-zinc-200">bus_mask in ['0x0A2', '0x0F0']</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live OPA Rego Code Viewer */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-white font-bold flex items-center gap-2">
+                  <FileCode className="w-4 h-4 text-brand-cyan" />
+                  Live Open Policy Agent (Rego) Definition
+                </span>
+                <span className="text-[10px] text-zinc-500">package soc.authz.fleet</span>
+              </div>
+
+              <pre className="p-3.5 bg-zinc-950 border border-panel-border rounded text-xs text-brand-cyan font-mono overflow-x-auto leading-relaxed">
+{`package soc.authz.fleet
+
+default allow = false
+
+# Rule: Emergency Remote Control Overrides
+allow {
+    input.action.method == "POST"
+    input.action.path == "/v1/fleet/control/emergency-stop"
+    input.subject.role == "DISPATCHER"
+    input.subject.mfa_verified == true
+    input.environment.soc_location == "Gangnam_SOC"
+    input.resource.vehicle_status == "CRITICAL_ANOMALY"
+}
+
+# Rule: OTA Campaign Execution Guard
+allow {
+    input.action.path == "/v1/ota/campaigns/dispatch"
+    input.subject.clearance_level >= 4
+    input.subject.scopes[_] == "ota:dispatch"
+    input.environment.fleet_threat_level != "CRITICAL" # OTA blocked during critical threat
+}`}
+              </pre>
+            </div>
+
+            <div className="p-3 bg-brand-cyan/5 border border-brand-cyan/20 rounded flex items-center justify-between text-xs">
+              <span className="text-zinc-400 text-[11px]">
+                OPA Policies are evaluated in &lt; 0.8ms at the API Gateway Envoy WASM filter layer before hitting upstream services.
+              </span>
+              <button 
+                onClick={() => alert("Simulating OPA Policy Evaluation against current SOC Operator claims: RESULT = ALLOW (200)")}
+                className="px-3 py-1 bg-brand-cyan text-black rounded text-[10px] font-bold uppercase transition-colors shrink-0 ml-4 cursor-pointer"
+              >
+                Evaluate Policy
               </button>
             </div>
           </div>

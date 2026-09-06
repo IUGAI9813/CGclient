@@ -16,7 +16,9 @@ import {
   ChevronRight, 
   MapPin, 
   Lock,
-  Database
+  Database,
+  Network,
+  KeyRound
 } from "lucide-react";
 import { useLanguage } from "./LanguageContext";
 
@@ -62,6 +64,8 @@ export default function ConsoleLayout({
 
   const navItems = [
     { id: "dashboard", label: t("nav.dashboard"), icon: Activity, badge: null },
+    { id: "gateway", label: t("nav.gateway"), icon: Network, badge: "6/6 UP", badgeColor: "bg-brand-emerald" },
+    { id: "iam", label: t("nav.iam"), icon: KeyRound, badge: "OIDC", badgeColor: "bg-brand-cyan" },
     { id: "incidents", label: t("nav.incidents"), icon: AlertTriangle, badge: incidentCount > 0 ? incidentCount : null, badgeColor: "bg-brand-rose" },
     { id: "fleet", label: t("nav.fleet"), icon: Compass, badge: "148/150", badgeColor: "bg-brand-cyan" },
     { id: "audit", label: t("nav.audit"), icon: FileText, badge: null },

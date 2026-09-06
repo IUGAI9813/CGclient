@@ -14,10 +14,12 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // ConsoleLayout
     "nav.dashboard": "Dashboard",
+    "nav.gateway": "API Gateway (Tyk)",
+    "nav.iam": "IAM & OAuth 2.0",
     "nav.incidents": "Incidents & Alerts",
     "nav.fleet": "Fleet & Devices",
     "nav.audit": "Audit Trail",
-    "nav.settings": "System & Access",
+    "nav.settings": "System & ABAC",
     "layout.title": "COREGUARD SOC",
     "layout.subtitle": "42dot Safety Unit",
     "layout.threat": "THREAT STATUS:",
@@ -203,10 +205,12 @@ const translations: Record<Language, Record<string, string>> = {
   ko: {
     // ConsoleLayout
     "nav.dashboard": "대시보드",
+    "nav.gateway": "API 게이트웨이 (Tyk)",
+    "nav.iam": "IAM 및 OAuth 2.0",
     "nav.incidents": "인시던트 및 알림",
     "nav.fleet": "플릿 및 디바이스",
     "nav.audit": "감사 추적",
-    "nav.settings": "시스템 및 권한",
+    "nav.settings": "시스템 및 ABAC",
     "layout.title": "코어가드 SOC",
     "layout.subtitle": "42dot 안전 부서",
     "layout.threat": "위협 상태:",

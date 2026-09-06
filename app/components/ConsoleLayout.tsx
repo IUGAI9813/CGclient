@@ -18,6 +18,7 @@ import {
   Lock,
   Database
 } from "lucide-react";
+import { useLanguage } from "./LanguageContext";
 
 interface ConsoleLayoutProps {
   activeTab: string;
@@ -40,6 +41,7 @@ export default function ConsoleLayout({
   children,
   incidentCount
 }: ConsoleLayoutProps) {
+  const { language, setLanguage, t } = useLanguage();
   const [currentTime, setCurrentTime] = useState("");
   const [utcTime, setUtcTime] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("Seoul - Gangnam SOC");
@@ -48,21 +50,22 @@ export default function ConsoleLayout({
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setCurrentTime(now.toLocaleTimeString("ko-KR", { hour12: false }) + `.${String(now.getMilliseconds()).padStart(3, "0")}`);
+      const locale = language === "ko" ? "ko-KR" : "en-US";
+      setCurrentTime(now.toLocaleTimeString(locale, { hour12: false }) + `.${String(now.getMilliseconds()).padStart(3, "0")}`);
       setUtcTime(now.toUTCString().replace("GMT", "UTC"));
     };
 
     updateTime();
     const interval = setInterval(updateTime, 45);
     return () => clearInterval(interval);
-  }, []);
+  }, [language]);
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: Activity, badge: null },
-    { id: "incidents", label: "Incidents & Alerts", icon: AlertTriangle, badge: incidentCount > 0 ? incidentCount : null, badgeColor: "bg-brand-rose" },
-    { id: "fleet", label: "Fleet & Devices", icon: Compass, badge: "148/150", badgeColor: "bg-brand-cyan" },
-    { id: "audit", label: "Audit Trail", icon: FileText, badge: null },
-    { id: "settings", label: "System & Access", icon: Settings, badge: null },
+    { id: "dashboard", label: t("nav.dashboard"), icon: Activity, badge: null },
+    { id: "incidents", label: t("nav.incidents"), icon: AlertTriangle, badge: incidentCount > 0 ? incidentCount : null, badgeColor: "bg-brand-rose" },
+    { id: "fleet", label: t("nav.fleet"), icon: Compass, badge: "148/150", badgeColor: "bg-brand-cyan" },
+    { id: "audit", label: t("nav.audit"), icon: FileText, badge: null },
+    { id: "settings", label: t("nav.settings"), icon: Settings, badge: null },
   ];
 
   return (
@@ -71,7 +74,7 @@ export default function ConsoleLayout({
       {panicMode && (
         <div className="bg-brand-rose text-black py-1.5 px-4 font-mono text-xs font-bold tracking-widest text-center flex items-center justify-center gap-2 animate-pulse">
           <AlertTriangle className="w-4 h-4 animate-bounce" />
-          <span>CRITICAL SYSTEM EMERGENCY OVERRIDE: GLOBAL SAFE-STOP PROTOCOLS ENGAGED</span>
+          <span>{t("layout.emergency")}</span>
           <AlertTriangle className="w-4 h-4 animate-bounce" />
         </div>
       )}
@@ -92,8 +95,8 @@ export default function ConsoleLayout({
               </div>
               {!sidebarCollapsed && (
                 <div className="flex flex-col">
-                  <span className="font-mono font-bold text-xs tracking-wider text-white">COREGUARD SOC</span>
-                  <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">42dot Safety Unit</span>
+                  <span className="font-mono font-bold text-xs tracking-wider text-white">{t("layout.title")}</span>
+                  <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">{t("layout.subtitle")}</span>
                 </div>
               )}
             </div>
@@ -102,7 +105,7 @@ export default function ConsoleLayout({
             {!sidebarCollapsed && (
               <div className="p-4 border-b border-panel-border bg-zinc-900/30 font-mono text-[11px] space-y-2">
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>THREAT STATUS:</span>
+                  <span>{t("layout.threat")}</span>
                   <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${
                     threatLevel === "CRITICAL" || panicMode
                       ? "text-brand-rose bg-brand-rose/10 border border-brand-rose/20 animate-pulse"
@@ -110,17 +113,17 @@ export default function ConsoleLayout({
                       ? "text-brand-amber bg-brand-amber/10 border border-brand-amber/20"
                       : "text-brand-emerald bg-brand-emerald/10 border border-brand-emerald/20"
                   }`}>
-                    {panicMode ? "CRITICAL" : threatLevel}
+                    {panicMode ? t("layout.threat.critical") : t("layout.threat." + threatLevel.toLowerCase())}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>V2X LATENCY:</span>
+                  <span>{t("layout.latency")}</span>
                   <span className="text-brand-cyan font-bold">14 ms</span>
                 </div>
                 <div className="flex justify-between items-center text-zinc-400">
-                  <span>GPS LINK:</span>
+                  <span>{t("layout.gps")}</span>
                   <span className="text-brand-emerald font-bold flex items-center gap-1">
-                    <Wifi className="w-3 h-3" /> ACTIVE
+                    <Wifi className="w-3 h-3" /> {t("layout.gps_active")}
                   </span>
                 </div>
               </div>
@@ -201,7 +204,7 @@ export default function ConsoleLayout({
                         : "bg-brand-rose/10 text-brand-rose border-brand-rose/30 hover:bg-brand-rose/20"
                     }`}
                   >
-                    {panicMode ? "RESET SOC" : "TEST PANIC"}
+                    {panicMode ? t("layout.reset_soc") : t("layout.test_panic")}
                   </button>
                 </div>
               )}
@@ -230,11 +233,11 @@ export default function ConsoleLayout({
             <div className="flex-1 max-w-lg mx-6 hidden lg:block">
               <div className="border border-panel-border bg-zinc-900/30 rounded px-3 py-1 flex items-center gap-2.5 font-mono text-[11px] overflow-hidden">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald animate-pulse"></span>
-                <span className="text-zinc-400 uppercase tracking-wider font-bold">SYSTEM TIMELINE:</span>
+                <span className="text-zinc-400 uppercase tracking-wider font-bold">{t("layout.timeline")}</span>
                 <span className="text-zinc-300 truncate tracking-wide animate-pulse-slow">
                   {panicMode 
-                    ? "!!! ALERT: EMER EMERGENCY SHUTDOWN SENT TO ALL VEHS !!!" 
-                    : "Telemetry check complete: 148 vehicles responding, 2 in hangar sleep state."}
+                    ? t("layout.timeline_panic") 
+                    : t("layout.timeline_normal")}
                 </span>
               </div>
             </div>
@@ -249,11 +252,35 @@ export default function ConsoleLayout({
                   onChange={(e) => setSelectedRegion(e.target.value)}
                   className="bg-transparent border-none outline-none font-mono text-zinc-300 pr-4 appearance-none cursor-pointer text-[11px]"
                 >
-                  <option value="Seoul - Gangnam SOC">Seoul - Gangnam</option>
-                  <option value="Seoul - Pangyo Valley">Seoul - Pangyo</option>
-                  <option value="California - Cupertino Dev">California - Cupertino</option>
+                  <option value="Seoul - Gangnam SOC">{t("layout.region.seoul")}</option>
+                  <option value="Seoul - Pangyo Valley">{t("layout.region.pangyo")}</option>
+                  <option value="California - Cupertino Dev">{t("layout.region.california")}</option>
                 </select>
                 <ChevronRight className="w-3 h-3 text-zinc-500 pointer-events-none absolute right-2.5 rotate-90" />
+              </div>
+
+              {/* Language Switcher */}
+              <div className="flex border border-panel-border rounded overflow-hidden text-[9px] font-bold">
+                <button
+                  onClick={() => setLanguage("en")}
+                  className={`px-2 py-1.5 transition-all ${
+                    language === "en"
+                      ? "bg-brand-cyan text-black"
+                      : "bg-zinc-900 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => setLanguage("ko")}
+                  className={`px-2 py-1.5 transition-all ${
+                    language === "ko"
+                      ? "bg-brand-cyan text-black"
+                      : "bg-zinc-900 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  KO
+                </button>
               </div>
 
               {/* Precise Time indicators */}
@@ -288,18 +315,18 @@ export default function ConsoleLayout({
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5 text-zinc-400">
                 <span className={`w-1.5 h-1.5 rounded-full ${panicMode ? "bg-brand-rose animate-ping" : "bg-brand-emerald"}`}></span>
-                COREGUARD CLOUD LINK: <span className="font-bold text-white">SECURE</span>
+                {t("layout.cloud_link")} <span className="font-bold text-white">{t("layout.cloud_secure")}</span>
               </span>
               <span className="hidden md:inline">|</span>
               <span className="hidden md:inline">
-                API SERVICE STATUS: <span className="text-brand-emerald font-bold">100% UP</span>
+                {t("layout.api_status")} <span className="text-brand-emerald font-bold">100% UP</span>
               </span>
             </div>
 
             <div className="flex items-center gap-4">
-              <span>DB CLUSTER: <span className="text-zinc-400 font-bold">REPLICATED</span></span>
+              <span>{t("layout.db_cluster")} <span className="text-zinc-400 font-bold">{t("layout.db_replicated")}</span></span>
               <span>|</span>
-              <span>VER: <span className="text-zinc-400 font-bold">v3.4.12-PROD</span></span>
+              <span>{t("layout.ver")} <span className="text-zinc-400 font-bold">v3.4.12-PROD</span></span>
             </div>
           </footer>
         </div>

@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
+import { useLanguage } from "../LanguageContext";
 
 interface Incident {
   id: string;
@@ -33,6 +34,7 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ onNavigateToTab, incidents, panicMode }: DashboardViewProps) {
+  const { t, language } = useLanguage();
   const [hoveredVehicle, setHoveredVehicle] = useState<string | null>(null);
 
   // Active vehicles data for the mock interactive map
@@ -58,7 +60,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           </div>
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Fleet Safety Score</span>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.score")}</span>
               <span className="text-2xl font-bold text-white tracking-tight block mt-1">
                 {panicMode ? "42.8%" : "98.4%"}
               </span>
@@ -70,7 +72,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           <div className="mt-3 flex items-center gap-1.5 text-xs">
             <TrendingUp className={`w-3.5 h-3.5 ${panicMode ? "text-brand-rose rotate-180" : "text-brand-emerald"}`} />
             <span className={panicMode ? "text-brand-rose" : "text-brand-emerald"}>
-              {panicMode ? "-55.6% (CRITICAL)" : "+0.4% vs last hour"}
+              {panicMode ? `-55.6% (${t("dashboard.critical")})` : `+0.4% ${t("dashboard.vs_last_hour")}`}
             </span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-emerald to-transparent opacity-30"></div>
@@ -86,7 +88,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           </div>
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Active Alerts</span>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.alerts")}</span>
               <span className={`text-2xl font-bold tracking-tight block mt-1 ${activeAlertsCount > 0 ? "text-brand-rose animate-pulse" : "text-white"}`}>
                 {activeAlertsCount}
               </span>
@@ -96,9 +98,9 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="text-zinc-500">Unresolved anomalies:</span>
+            <span className="text-zinc-500">{t("dashboard.unresolved")}</span>
             <span className={`font-bold ${activeAlertsCount > 0 ? "text-brand-rose" : "text-zinc-300"}`}>
-              {incidents.filter(i => i.severity === "CRITICAL" && i.status === "ACTIVE").length} Critical
+              {incidents.filter(i => i.severity === "CRITICAL" && i.status === "ACTIVE").length} {t("dashboard.critical")}
             </span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-rose to-transparent opacity-30"></div>
@@ -111,7 +113,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           </div>
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">V2X Core Latency</span>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.latency")}</span>
               <span className="text-2xl font-bold text-white tracking-tight block mt-1">14.2 ms</span>
             </div>
             <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-cyan">
@@ -120,7 +122,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-brand-emerald">
             <Zap className="w-3.5 h-3.5" />
-            <span>99.98% telemetry frame rate</span>
+            <span>{t("dashboard.telemetry_rate")}</span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-cyan to-transparent opacity-30"></div>
         </div>
@@ -135,7 +137,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           </div>
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Fleet In Service</span>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.fleet_service")}</span>
               <span className="text-2xl font-bold text-white tracking-tight block mt-1">148 / 150</span>
             </div>
             <div className="p-2 rounded bg-zinc-900 border border-panel-border text-zinc-400 group-hover:text-white">
@@ -143,8 +145,8 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="text-zinc-500">Standby:</span>
-            <span className="text-zinc-300 font-bold">2 in hangar depot</span>
+            <span className="text-zinc-500">{t("dashboard.standby")}</span>
+            <span className="text-zinc-300 font-bold">{t("dashboard.hangar")}</span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-zinc-500 to-transparent opacity-30"></div>
         </div>
@@ -159,9 +161,9 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
-                <span className="text-xs font-bold text-white tracking-widest uppercase">GANGNAM REGION AUTOMATED GEOLOCATOR</span>
+                <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.map_header")}</span>
               </div>
-              <span className="text-[10px] text-zinc-500 font-bold">GRID SCALE: 1:500m</span>
+              <span className="text-[10px] text-zinc-500 font-bold">{language === "ko" ? "그리드 스케일: 1:500m" : "GRID SCALE: 1:500m"}</span>
             </div>
 
             {/* Simulated Vector Grid Map */}
@@ -222,14 +224,14 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
                         <div className="font-bold text-white border-b border-panel-border pb-1 flex justify-between">
                           <span>{veh.id}</span>
                           <span className={isCritical ? "text-brand-rose" : isWarning ? "text-brand-amber" : "text-brand-emerald"}>
-                            {isCritical ? "ALERT" : isWarning ? "WARN" : "SECURE"}
+                            {isCritical ? t("incidents.active_stat") : isWarning ? (language === "ko" ? "주의" : "WARN") : t("fleet.sensors_ok")}
                           </span>
                         </div>
                         <div className="mt-1 space-y-0.5">
-                          <div>TYPE: {veh.type}</div>
-                          <div>SPEED: {isCritical ? "0 km/h" : "48 km/h"}</div>
+                          <div>{language === "ko" ? "유형" : "TYPE"}: {veh.type}</div>
+                          <div>{language === "ko" ? "속도" : "SPEED"}: {isCritical ? "0 km/h" : "48 km/h"}</div>
                           <div>GPS: 37.517, 127.047</div>
-                          <div className="text-brand-cyan underline cursor-pointer mt-1">Click to analyze</div>
+                          <div className="text-brand-cyan underline cursor-pointer mt-1">{language === "ko" ? "클릭하여 분석" : "Click to analyze"}</div>
                         </div>
                       </div>
                     )}
@@ -241,15 +243,15 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
               <div className="absolute bottom-4 left-4 p-2 bg-zinc-950/95 border border-panel-border rounded text-[9px] space-y-1 z-15">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald"></span>
-                  <span className="text-zinc-400">144 SECURE OBJECTS</span>
+                  <span className="text-zinc-400">144 {t("dashboard.map.secure_objects")}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-amber"></span>
-                  <span className="text-zinc-400">3 WARNING OVERRIDES</span>
+                  <span className="text-zinc-400">3 {t("dashboard.map.warning_overrides")}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-rose animate-pulse"></span>
-                  <span className="text-zinc-400">{panicMode ? "148 EMERGENCY TRIPPED" : "1 CRITICAL TAMPER"}</span>
+                  <span className="text-zinc-400">{panicMode ? `148 ${t("dashboard.map.emergency_tripped")}` : `1 ${t("dashboard.map.critical_tamper")}`}</span>
                 </div>
               </div>
             </div>
@@ -262,9 +264,9 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-brand-cyan" />
-                <span className="text-xs font-bold text-white tracking-widest uppercase">LIDAR TELEMETRY FRAMERATE</span>
+                <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.lidar_header")}</span>
               </div>
-              <span className="text-[9px] font-bold text-brand-cyan">12H TREND</span>
+              <span className="text-[9px] font-bold text-brand-cyan">{t("dashboard.trend_12h")}</span>
             </div>
 
             <div className="flex-1 p-4 bg-zinc-950/30 flex flex-col justify-between">
@@ -279,7 +281,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
                   {/* Threat Area Background (Mock Red Alert region) */}
                   <rect x="180" y="60" width="40" height="60" fill="rgba(244, 63, 94, 0.08)" />
-                  <text x="185" y="80" fill="#f43f5e" className="text-[7px]" fontFamily="monospace">Anomalous Drop</text>
+                  <text x="185" y="80" fill="#f43f5e" className="text-[7px]" fontFamily="monospace">{t("dashboard.anomalous_drop")}</text>
 
                   {/* Ingestion Stream Path */}
                   <path 
@@ -308,13 +310,13 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
               {/* Data points summary breakdown */}
               <div className="border-t border-panel-border mt-4 pt-4 grid grid-cols-2 gap-2 text-[10px]">
                 <div className="bg-zinc-900/50 p-2 rounded border border-panel-border">
-                  <span className="text-zinc-500 block uppercase">Packet Success</span>
+                  <span className="text-zinc-500 block uppercase">{t("dashboard.packet_success")}</span>
                   <span className={`font-bold text-sm ${panicMode ? "text-brand-rose" : "text-white"}`}>
                     {panicMode ? "12.42%" : "99.97%"}
                   </span>
                 </div>
                 <div className="bg-zinc-900/50 p-2 rounded border border-panel-border">
-                  <span className="text-zinc-500 block uppercase">CAN Message Rate</span>
+                  <span className="text-zinc-500 block uppercase">{t("dashboard.can_rate")}</span>
                   <span className="text-white font-bold text-sm">4.8k / sec</span>
                 </div>
               </div>
@@ -328,12 +330,12 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
         {/* Active Incidents Dashboard Summary */}
         <div className="cyber-panel rounded flex flex-col min-h-[220px]">
           <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
-            <span className="text-xs font-bold text-white tracking-widest uppercase">Active Incidents Queue</span>
+            <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.incidents_queue")}</span>
             <button 
               onClick={() => onNavigateToTab("incidents")}
               className="text-[9px] text-brand-cyan hover:underline flex items-center gap-1 font-bold"
             >
-              INVESTIGATE ALL <ArrowUpRight className="w-3.5 h-3.5" />
+              {t("dashboard.investigate_all")} <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -341,7 +343,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             {incidents.filter(i => i.status === "ACTIVE").length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-zinc-500 text-xs py-8 gap-2">
                 <CheckCircle2 className="w-8 h-8 text-brand-emerald" />
-                <span>Zero active safety incidents reported.</span>
+                <span>{t("dashboard.zero_active")}</span>
               </div>
             ) : (
               incidents.filter(i => i.status === "ACTIVE").slice(0, 3).map((incident) => (
@@ -384,12 +386,12 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
         {/* Real-time Audit Trail Ticker */}
         <div className="cyber-panel rounded flex flex-col min-h-[220px]">
           <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
-            <span className="text-xs font-bold text-white tracking-widest uppercase">Live Audit Ticker</span>
+            <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.live_audit")}</span>
             <button 
               onClick={() => onNavigateToTab("audit")}
               className="text-[9px] text-zinc-500 hover:text-white flex items-center gap-1 font-bold"
             >
-              EXPLORE LOGS <ArrowUpRight className="w-3.5 h-3.5" />
+              {t("dashboard.explore_logs")} <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -397,28 +399,36 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
             <div className="flex gap-2 text-zinc-500">
               <span>[22:58:14]</span>
               <span className="text-brand-emerald">INFO</span>
-              <span className="text-zinc-300">RBAC: Dispatcher Alex S. logged in from IP 10.42.9.11</span>
+              <span className="text-zinc-300">
+                {language === "ko" ? "RBAC: 디스패처 Alex S.가 IP 10.42.9.11에서 로그인함" : "RBAC: Dispatcher Alex S. logged in from IP 10.42.9.11"}
+              </span>
             </div>
             <div className="flex gap-2 text-zinc-500">
               <span>[22:57:42]</span>
               <span className="text-brand-cyan">SYS</span>
-              <span className="text-zinc-300">OTA: Ingress telemetry signed cryptographically for seoul-sub-04</span>
+              <span className="text-zinc-300">
+                {language === "ko" ? "OTA: seoul-sub-04에 대해 데이터 수집 텔레메트리가 암호 서명됨" : "OTA: Ingress telemetry signed cryptographically for seoul-sub-04"}
+              </span>
             </div>
             <div className="flex gap-2 text-zinc-500">
               <span>[22:56:01]</span>
               <span className="text-brand-amber">WARN</span>
-              <span className="text-brand-amber">ANOMALY: High jitter rate detected on sensor port LIDAR_3 (VEH-42-012)</span>
+              <span className="text-brand-amber">
+                {language === "ko" ? "이상 현상: 센서 포트 LIDAR_3(VEH-42-012)에서 높은 지터율 탐지됨" : "ANOMALY: High jitter rate detected on sensor port LIDAR_3 (VEH-42-012)"}
+              </span>
             </div>
             <div className="flex gap-2 text-zinc-500">
               <span>[22:54:19]</span>
               <span className="text-zinc-500">DEBUG</span>
-              <span className="text-zinc-400">Heartbeat confirmation: DB cluster synchronised (latency: 1.2ms)</span>
+              <span className="text-zinc-400">
+                {language === "ko" ? "하트비트 확인: DB 클러스터 동기화 완료 (지연 시간: 1.2ms)" : "Heartbeat confirmation: DB cluster synchronised (latency: 1.2ms)"}
+              </span>
             </div>
             {panicMode && (
               <div className="flex gap-2 text-brand-rose animate-pulse font-bold">
-                <span>[SYSTEM EVENT]</span>
-                <span>OVERRIDE</span>
-                <span>FAILSAFE TRIGGERED: Broadcast Emergency Stop signal sent to 148 vehicles.</span>
+                <span>[{language === "ko" ? "시스템 이벤트" : "SYSTEM EVENT"}]</span>
+                <span>{language === "ko" ? "오버라이드" : "OVERRIDE"}</span>
+                <span>{language === "ko" ? "안전 장치 작동: 148대 차량에 비상 정지 신호 브로드캐스트됨." : "FAILSAFE TRIGGERED: Broadcast Emergency Stop signal sent to 148 vehicles."}</span>
               </div>
             )}
           </div>

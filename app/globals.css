@@ -1,18 +1,52 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
 @import "tailwindcss";
 @import "../shared/styles/style.css";
 
-:root {
-  --background: #09090b; /* Zinc 950 */
-  --foreground: #f4f4f5; /* Zinc 100 */
+/* ==========================================================================
+   Korean Enterprise Dual Theme Tokens (Toss / Naver / 42dot Standards)
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0b0e14;        /* Deep Slate / Charcoal */
+  --foreground: #f1f5f9;        /* Slate 100 */
   
-  --panel-bg: #121217;
-  --panel-border: #202027;
-  --panel-border-hover: #3f3f46;
+  --panel-bg: #121622;          /* Matte Dark Slate */
+  --panel-header-bg: #161b2a;   /* Header Dark */
+  --panel-border: #23293b;      /* Clean Dark Divider */
+  --panel-border-hover: #3b445c;
   
-  --brand-cyan: #06b6d4;   /* Cyber Info */
-  --brand-emerald: #10b981;/* Cyber Secure */
-  --brand-amber: #f59e0b;  /* Cyber Warning */
-  --brand-rose: #f43f5e;   /* Cyber Critical */
+  --brand-cyan: #38bdf8;        /* Electric Azure Sky */
+  --brand-emerald: #10b981;     /* Secure Emerald */
+  --brand-amber: #f59e0b;       /* Warning Amber */
+  --brand-rose: #f43f5e;        /* Critical Rose */
+  
+  --input-bg: #090c12;
+  --input-border: #23293b;
+  --muted-text: #94a3b8;
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f8fafc;        /* Korean Clean Slate 50 */
+  --foreground: #0f172a;        /* Crisp Slate 900 */
+  
+  --panel-bg: #ffffff;          /* Pure Crisp White */
+  --panel-header-bg: #f8fafc;   /* Light Slate 50 */
+  --panel-border: #e2e8f0;      /* Gentle Slate 200 */
+  --panel-border-hover: #cbd5e1;
+  
+  --brand-cyan: #0284c7;        /* Hyundai / Toss Corporate Blue */
+  --brand-emerald: #059669;     /* Deep Forest Emerald */
+  --brand-amber: #d97706;       /* Deep Amber */
+  --brand-rose: #e11d48;        /* Vibrant Crimson */
+  
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --muted-text: #64748b;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
 @theme {
@@ -23,27 +57,38 @@
   --color-brand-emerald: var(--brand-emerald);
   --color-brand-amber: var(--brand-amber);
   --color-brand-rose: var(--brand-rose);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   
-  --animate-scanline: scanline 8s linear infinite;
   --animate-pulse-glow: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 1px currentColor); }
-  50% { opacity: 1; filter: drop-shadow(0 0 8px currentColor); }
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  letter-spacing: -0.018em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Korean typography polish: buttons, inputs, selects inherit Pretendard */
+button, input, select, textarea, optgroup {
+  font-family: inherit;
+  letter-spacing: inherit;
+}
+
+/* Tabular numbers for telematics, timers, and KPI figures */
+.tabular-nums,
+table td,
+.font-mono {
+  font-feature-settings: "tnum" 1, "cv05" 1;
 }
 
 /* Custom Premium Scrollbar */
@@ -53,16 +98,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--panel-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--panel-border-hover);
 }
 
 /* Radar ping animations */
@@ -84,22 +129,119 @@ body {
   opacity: 0.75;
 }
 
-/* Map Grid Overlay */
+/* Subtle Map Grid Overlay */
 .map-grid {
   background-image: 
-    linear-gradient(to right, rgba(39, 39, 42, 0.2) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(39, 39, 42, 0.2) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Cyber panel styling */
+/* Clean Enterprise Panel */
 .cyber-panel {
-  background: rgba(18, 18, 23, 0.75);
+  background: var(--panel-bg);
   backdrop-filter: blur(12px);
   border: 1px solid var(--panel-border);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cyber-panel:hover {
   border-color: var(--panel-border-hover);
+}
+
+/* ==========================================================================
+   Light Mode Seamless Component Overrides (Toss / Korean Enterprise B2B)
+   ========================================================================== */
+
+[data-theme="light"] header,
+[data-theme="light"] footer,
+[data-theme="light"] aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .cyber-panel {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] .cyber-panel-header {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] [class*="bg-black"]:not([class*="bg-brand-"]):not(span[class*="rounded-full"]) {
+  background-color: #f8fafc !important;
+}
+
+[data-theme="light"] [class*="bg-zinc-950"]:not([class*="bg-brand-"]) {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] [class*="bg-zinc-900"]:not([class*="bg-brand-"]) {
+  background-color: #f1f5f9 !important;
+}
+
+[data-theme="light"] [class*="bg-zinc-800"]:not([class*="bg-brand-"]) {
+  background-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] [class*="hover:bg-zinc-"]:hover:not([class*="bg-brand-"]) {
+  background-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] table thead tr,
+[data-theme="light"] table thead th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Text readability in light mode */
+[data-theme="light"] .text-white:not(button[class*="bg-brand-"]):not(span[class*="bg-brand-"]):not(div[class*="bg-brand-"]):not(a[class*="bg-brand-"]) {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .text-zinc-100 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .text-zinc-200,
+[data-theme="light"] .text-zinc-300 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-zinc-400 {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .text-zinc-500 {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-zinc-700,
+[data-theme="light"] .border-zinc-900 {
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .map-grid {
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px) !important;
 }

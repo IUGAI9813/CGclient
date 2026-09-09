@@ -55,17 +55,17 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Fleet Safety Score */}
         <div className="cyber-panel p-4 rounded relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-1 text-[9px] bg-zinc-900 border-l border-b border-panel-border text-zinc-500">
+          <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
             SEC_INDEX_01
           </div>
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.score")}</span>
-              <span className="text-2xl font-bold text-white tracking-tight block mt-1">
+              <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">
                 {panicMode ? "42.8%" : "98.4%"}
               </span>
             </div>
-            <div className={`p-2 rounded bg-zinc-900 border ${panicMode ? "border-brand-rose text-brand-rose" : "border-brand-emerald text-brand-emerald"}`}>
+            <div className={`p-2 rounded bg-[var(--panel-header-bg)] border ${panicMode ? "border-brand-rose text-brand-rose" : "border-brand-emerald text-brand-emerald"}`}>
               <Shield className="w-5 h-5" />
             </div>
           </div>
@@ -83,17 +83,17 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
           onClick={() => onNavigateToTab("incidents")}
           className="cyber-panel p-4 rounded relative overflow-hidden group cursor-pointer hover:border-zinc-700 transition-all"
         >
-          <div className="absolute top-0 right-0 p-1 text-[9px] bg-zinc-900 border-l border-b border-panel-border text-zinc-500">
+          <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
             ALERT_CTR_02
           </div>
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.alerts")}</span>
-              <span className={`text-2xl font-bold tracking-tight block mt-1 ${activeAlertsCount > 0 ? "text-brand-rose animate-pulse" : "text-white"}`}>
+              <span className={`text-2xl font-bold tracking-tight block mt-1 ${activeAlertsCount > 0 ? "text-brand-rose animate-pulse" : "text-[var(--foreground)]"}`}>
                 {activeAlertsCount}
               </span>
             </div>
-            <div className={`p-2 rounded bg-zinc-900 border ${activeAlertsCount > 0 ? "border-brand-rose text-brand-rose animate-pulse" : "border-panel-border text-zinc-400"}`}>
+            <div className={`p-2 rounded bg-[var(--panel-header-bg)] border ${activeAlertsCount > 0 ? "border-brand-rose text-brand-rose animate-pulse" : "border-panel-border text-zinc-400"}`}>
               <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
@@ -108,15 +108,15 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
         {/* KPI 3: V2X Latency */}
         <div className="cyber-panel p-4 rounded relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-1 text-[9px] bg-zinc-900 border-l border-b border-panel-border text-zinc-500">
+          <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
             NET_PING_03
           </div>
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.latency")}</span>
-              <span className="text-2xl font-bold text-white tracking-tight block mt-1">14.2 ms</span>
+              <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">14.2 ms</span>
             </div>
-            <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-cyan">
+            <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-brand-cyan">
               <Radio className="w-5 h-5" />
             </div>
           </div>
@@ -130,23 +130,23 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
         {/* KPI 4: Active Fleet Status */}
         <div 
           onClick={() => onNavigateToTab("fleet")}
-          className="cyber-panel p-4 rounded relative overflow-hidden group cursor-pointer hover:border-zinc-700 transition-all"
+          className="cyber-panel p-4 rounded relative overflow-hidden group cursor-pointer hover:border-panel-border-hover transition-all"
         >
-          <div className="absolute top-0 right-0 p-1 text-[9px] bg-zinc-900 border-l border-b border-panel-border text-zinc-500">
+          <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
             FLT_STAT_04
           </div>
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{t("dashboard.fleet_service")}</span>
-              <span className="text-2xl font-bold text-white tracking-tight block mt-1">148 / 150</span>
+              <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">148 / 150</span>
             </div>
-            <div className="p-2 rounded bg-zinc-900 border border-panel-border text-zinc-400 group-hover:text-white">
+            <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-zinc-400 group-hover:text-[var(--foreground)]">
               <Compass className="w-5 h-5 animate-spin" style={{ animationDuration: "10s" }} />
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
             <span className="text-zinc-500">{t("dashboard.standby")}</span>
-            <span className="text-zinc-300 font-bold">{t("dashboard.hangar")}</span>
+            <span className="text-zinc-400 font-bold">{t("dashboard.hangar")}</span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-zinc-500 to-transparent opacity-30"></div>
         </div>
@@ -158,16 +158,16 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
         <div className="lg:col-span-2 space-y-6">
           {/* Interactive Vehicle Locator Map Widget */}
           <div className="cyber-panel rounded overflow-hidden flex flex-col relative h-[360px]">
-            <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center z-10">
+            <div className="p-3 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-center z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
-                <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.map_header")}</span>
+                <span className="text-xs font-bold text-[var(--foreground)] tracking-widest uppercase">{t("dashboard.map_header")}</span>
               </div>
               <span className="text-[10px] text-zinc-500 font-bold">{language === "ko" ? "그리드 스케일: 1:500m" : "GRID SCALE: 1:500m"}</span>
             </div>
 
             {/* Simulated Vector Grid Map */}
-            <div className="flex-1 bg-zinc-950 relative overflow-hidden flex items-center justify-center p-4">
+            <div className="flex-1 bg-[var(--panel-bg)] relative overflow-hidden flex items-center justify-center p-4">
               {/* Grid map overlay */}
               <div className="absolute inset-0 map-grid opacity-75"></div>
               
@@ -182,7 +182,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
               {/* Central base station */}
               <div className="absolute top-[48%] left-[48%] flex flex-col items-center">
-                <div className="w-4 h-4 rounded-full bg-zinc-900 border-2 border-brand-cyan flex items-center justify-center relative">
+                <div className="w-4 h-4 rounded-full bg-[var(--panel-bg)] border-2 border-brand-cyan flex items-center justify-center relative">
                   <div className="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-ping"></div>
                 </div>
                 <span className="text-[8px] text-zinc-500 font-bold mt-1 tracking-tighter">BASE_SOC</span>
@@ -220,8 +220,8 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
                     {/* Popover overlay on hover */}
                     {hoveredVehicle === veh.id && (
-                      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-zinc-900/95 border border-zinc-700 rounded p-2 text-[9px] w-36 shadow-xl z-30 font-mono text-zinc-300">
-                        <div className="font-bold text-white border-b border-panel-border pb-1 flex justify-between">
+                      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-[var(--panel-bg)] border border-panel-border rounded p-2 text-[9px] w-36 shadow-xl z-30 font-mono text-zinc-400">
+                        <div className="font-bold text-[var(--foreground)] border-b border-panel-border pb-1 flex justify-between">
                           <span>{veh.id}</span>
                           <span className={isCritical ? "text-brand-rose" : isWarning ? "text-brand-amber" : "text-brand-emerald"}>
                             {isCritical ? t("incidents.active_stat") : isWarning ? (language === "ko" ? "주의" : "WARN") : t("fleet.sensors_ok")}
@@ -240,7 +240,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
               })}
 
               {/* Map Info Box */}
-              <div className="absolute bottom-4 left-4 p-2 bg-zinc-950/95 border border-panel-border rounded text-[9px] space-y-1 z-15">
+              <div className="absolute bottom-4 left-4 p-2 bg-[var(--panel-bg)]/95 border border-panel-border rounded text-[9px] space-y-1 z-15 shadow-sm">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald"></span>
                   <span className="text-zinc-400">144 {t("dashboard.map.secure_objects")}</span>
@@ -261,23 +261,23 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
         {/* Right 1 Column: Telemetry Analytics Chart & Diagnostics Info */}
         <div className="space-y-6">
           <div className="cyber-panel rounded flex flex-col h-[360px]">
-            <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
+            <div className="p-3 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-brand-cyan" />
-                <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.lidar_header")}</span>
+                <span className="text-xs font-bold text-[var(--foreground)] tracking-widest uppercase">{t("dashboard.lidar_header")}</span>
               </div>
               <span className="text-[9px] font-bold text-brand-cyan">{t("dashboard.trend_12h")}</span>
             </div>
 
-            <div className="flex-1 p-4 bg-zinc-950/30 flex flex-col justify-between">
+            <div className="flex-1 p-4 bg-transparent flex flex-col justify-between">
               {/* Custom SVG Line Chart */}
               <div className="flex-1 relative min-h-[140px] w-full flex items-end">
                 {/* SVG Render */}
                 <svg className="w-full h-full text-zinc-800" viewBox="0 0 300 120" preserveAspectRatio="none">
                   {/* Grid Lines */}
-                  <line x1="0" y1="30" x2="300" y2="30" stroke="#1f1f23" strokeDasharray="3,3" />
-                  <line x1="0" y1="60" x2="300" y2="60" stroke="#1f1f23" strokeDasharray="3,3" />
-                  <line x1="0" y1="90" x2="300" y2="90" stroke="#1f1f23" strokeDasharray="3,3" />
+                  <line x1="0" y1="30" x2="300" y2="30" stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" strokeDasharray="3,3" />
+                  <line x1="0" y1="60" x2="300" y2="60" stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" strokeDasharray="3,3" />
+                  <line x1="0" y1="90" x2="300" y2="90" stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" strokeDasharray="3,3" />
 
                   {/* Threat Area Background (Mock Red Alert region) */}
                   <rect x="180" y="60" width="40" height="60" fill="rgba(244, 63, 94, 0.08)" />
@@ -290,7 +290,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
                       : "M0,35 L30,42 L60,32 L90,38 L120,25 L150,45 L180,82 L210,48 L240,30 L270,35 L300,28"
                     } 
                     fill="none" 
-                    stroke={panicMode ? "#f43f5e" : "#06b6d4"} 
+                    stroke={panicMode ? "#f43f5e" : "#0284c7"} 
                     strokeWidth="2" 
                     className="transition-all duration-500"
                   />
@@ -300,7 +300,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
                 </svg>
 
                 {/* Y-axis metrics descriptors */}
-                <div className="absolute left-1 top-2 text-[8px] text-zinc-600 flex flex-col justify-between h-[80%] pointer-events-none">
+                <div className="absolute left-1 top-2 text-[8px] text-zinc-500 flex flex-col justify-between h-[80%] pointer-events-none">
                   <span>100k/s</span>
                   <span>50k/s</span>
                   <span>0k/s</span>
@@ -309,15 +309,15 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
               {/* Data points summary breakdown */}
               <div className="border-t border-panel-border mt-4 pt-4 grid grid-cols-2 gap-2 text-[10px]">
-                <div className="bg-zinc-900/50 p-2 rounded border border-panel-border">
+                <div className="bg-[var(--panel-header-bg)] p-2 rounded border border-panel-border">
                   <span className="text-zinc-500 block uppercase">{t("dashboard.packet_success")}</span>
-                  <span className={`font-bold text-sm ${panicMode ? "text-brand-rose" : "text-white"}`}>
+                  <span className={`font-bold text-sm ${panicMode ? "text-brand-rose" : "text-[var(--foreground)]"}`}>
                     {panicMode ? "12.42%" : "99.97%"}
                   </span>
                 </div>
-                <div className="bg-zinc-900/50 p-2 rounded border border-panel-border">
+                <div className="bg-[var(--panel-header-bg)] p-2 rounded border border-panel-border">
                   <span className="text-zinc-500 block uppercase">{t("dashboard.can_rate")}</span>
-                  <span className="text-white font-bold text-sm">4.8k / sec</span>
+                  <span className="text-[var(--foreground)] font-bold text-sm">4.8k / sec</span>
                 </div>
               </div>
             </div>
@@ -329,15 +329,15 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div 
           onClick={() => onNavigateToTab("gateway")}
-          className="cyber-panel p-3.5 rounded cursor-pointer hover:border-brand-cyan/60 transition-all flex items-center justify-between bg-zinc-950/40 group"
+          className="cyber-panel p-3.5 rounded cursor-pointer hover:border-brand-cyan/60 transition-all flex items-center justify-between bg-[var(--panel-bg)] group"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-cyan group-hover:border-brand-cyan">
+            <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-brand-cyan group-hover:border-brand-cyan">
               <Network className="w-5 h-5" />
             </div>
             <div>
               <span className="text-[10px] text-zinc-500 uppercase font-bold block">Tyk Ingress Control Plane</span>
-              <div className="text-xs font-bold text-white flex items-center gap-2 mt-0.5">
+              <div className="text-xs font-bold text-[var(--foreground)] flex items-center gap-2 mt-0.5">
                 <span>3,420 req/s Ingress</span>
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/30">
                   SLA 99.995%
@@ -350,15 +350,15 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
         <div 
           onClick={() => onNavigateToTab("iam")}
-          className="cyber-panel p-3.5 rounded cursor-pointer hover:border-brand-cyan/60 transition-all flex items-center justify-between bg-zinc-950/40 group"
+          className="cyber-panel p-3.5 rounded cursor-pointer hover:border-brand-cyan/60 transition-all flex items-center justify-between bg-[var(--panel-bg)] group"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-emerald group-hover:border-brand-emerald">
+            <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-brand-emerald group-hover:border-brand-emerald">
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
               <span className="text-[10px] text-zinc-500 uppercase font-bold block">OIDC / PKI Identity State</span>
-              <div className="text-xs font-bold text-white flex items-center gap-2 mt-0.5">
+              <div className="text-xs font-bold text-[var(--foreground)] flex items-center gap-2 mt-0.5">
                 <span>148 Vehicles mTLS Active</span>
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/30">
                   RS256 KMS Validated
@@ -374,8 +374,8 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Active Incidents Dashboard Summary */}
         <div className="cyber-panel rounded flex flex-col min-h-[220px]">
-          <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
-            <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.incidents_queue")}</span>
+          <div className="p-3 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-center">
+            <span className="text-xs font-bold text-[var(--foreground)] tracking-widest uppercase">{t("dashboard.incidents_queue")}</span>
             <button 
               onClick={() => onNavigateToTab("incidents")}
               className="text-[9px] text-brand-cyan hover:underline flex items-center gap-1 font-bold"
@@ -395,7 +395,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
                 <div 
                   key={incident.id} 
                   onClick={() => onNavigateToTab("incidents", incident)}
-                  className="py-2.5 flex items-center justify-between cursor-pointer hover:bg-zinc-900/50 px-2 rounded transition-colors group"
+                  className="py-2.5 flex items-center justify-between cursor-pointer hover:bg-[var(--panel-header-bg)] px-2 rounded transition-colors group"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
                     <span className={`p-1.5 rounded-full ${
@@ -406,7 +406,7 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
                       <AlertCircle className="w-3.5 h-3.5 animate-pulse" />
                     </span>
                     <div className="flex flex-col overflow-hidden">
-                      <span className="text-xs font-bold text-zinc-200 group-hover:text-white truncate">
+                      <span className="text-xs font-bold text-[var(--foreground)] truncate">
                         {incident.type}
                       </span>
                       <span className="text-[9px] text-zinc-500">
@@ -430,11 +430,11 @@ export default function DashboardView({ onNavigateToTab, incidents, panicMode }:
 
         {/* Real-time Audit Trail Ticker */}
         <div className="cyber-panel rounded flex flex-col min-h-[220px]">
-          <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
-            <span className="text-xs font-bold text-white tracking-widest uppercase">{t("dashboard.live_audit")}</span>
+          <div className="p-3 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-center">
+            <span className="text-xs font-bold text-[var(--foreground)] tracking-widest uppercase">{t("dashboard.live_audit")}</span>
             <button 
               onClick={() => onNavigateToTab("audit")}
-              className="text-[9px] text-zinc-500 hover:text-white flex items-center gap-1 font-bold"
+              className="text-[9px] text-zinc-500 hover:text-[var(--foreground)] flex items-center gap-1 font-bold"
             >
               {t("dashboard.explore_logs")} <ArrowUpRight className="w-3.5 h-3.5" />
             </button>

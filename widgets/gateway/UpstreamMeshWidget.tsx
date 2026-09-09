@@ -37,16 +37,16 @@ export const UpstreamMeshWidget: React.FC<UpstreamMeshWidgetProps> = ({
                 <th className="text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-panel-border bg-zinc-950/20">
+            <tbody className="divide-y divide-panel-border bg-transparent">
               {upstreams.map((up) => (
-                <tr key={up.id}>
-                  <td className="font-bold text-white">{up.name}</td>
-                  <td className="text-zinc-400 font-mono text-[11px]">{up.k8sService}</td>
-                  <td className="text-center font-bold text-zinc-300">{up.pods}</td>
-                  <td className="text-center text-cyan-400 font-bold">{up.latencyP95}</td>
+                <tr key={up.id} className="hover:bg-[var(--panel-header-bg)] transition-colors">
+                  <td className="font-bold text-[var(--foreground)]">{up.name}</td>
+                  <td className="text-zinc-500 font-mono text-[11px]">{up.k8sService}</td>
+                  <td className="text-center font-bold text-[var(--foreground)]">{up.pods}</td>
+                  <td className="text-center text-cyan-500 font-bold">{up.latencyP95}</td>
                   <td
                     className={`text-center font-bold ${
-                      parseFloat(up.errorRate) > 5 ? "text-rose-400" : "text-emerald-400"
+                      parseFloat(up.errorRate) > 5 ? "text-rose-500" : "text-emerald-500"
                     }`}
                   >
                     {up.errorRate}
@@ -59,8 +59,8 @@ export const UpstreamMeshWidget: React.FC<UpstreamMeshWidgetProps> = ({
                       onClick={() => onToggleCircuit(up.id)}
                       className={`px-2.5 py-1 text-[10px] font-bold rounded border transition-colors cursor-pointer ${
                         up.circuitState === "CLOSED"
-                          ? "bg-zinc-900 border-panel-border text-zinc-400 hover:text-rose-400 hover:border-rose-400"
-                          : "bg-emerald-500/20 border-emerald-500 text-emerald-400 hover:bg-emerald-500/30"
+                          ? "bg-[var(--panel-header-bg)] border-panel-border text-zinc-500 hover:text-[var(--foreground)] hover:border-panel-border-hover"
+                          : "bg-emerald-500/20 border-emerald-500 text-emerald-500 hover:bg-emerald-500/30"
                       }`}
                     >
                       {up.circuitState === "CLOSED" ? "Force Trip" : "Reset Breaker"}

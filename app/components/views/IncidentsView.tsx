@@ -1,14 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  AlertTriangle, 
-  Search, 
-  Check, 
-  Terminal, 
-  ShieldAlert, 
-  Sliders, 
-  Info 
+import {
+  AlertTriangle,
+  Search,
+  Check,
+  Terminal,
+  ShieldAlert,
+  Sliders,
+  ChevronRight,
+  X,
+  Car,
+  MessageSquare,
+  Send
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 
@@ -59,12 +63,19 @@ export default function IncidentsView({
         setSelectedIncident(selectedIncidentFromDashboard);
         clearSelectedIncidentFromDashboard();
       });
-    } else if (!selectedIncident && incidents.length > 0) {
-      queueMicrotask(() => {
-        setSelectedIncident(incidents[0]);
-      });
     }
-  }, [selectedIncidentFromDashboard, incidents, clearSelectedIncidentFromDashboard, selectedIncident]);
+  }, [selectedIncidentFromDashboard, clearSelectedIncidentFromDashboard]);
+
+  // Handle ESC key to close drawer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && selectedIncident) {
+        setSelectedIncident(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedIncident]);
 
   const handleUpdateStatus = (id: string, newStatus: "ACTIVE" | "TRIAGED" | "RESOLVED") => {
     setIncidents(prev => prev.map(inc => inc.id === id ? { ...inc, status: newStatus } : inc));
@@ -77,325 +88,527 @@ export default function IncidentsView({
   const filteredIncidents = incidents.filter(inc => {
     const matchesSeverity = severityFilter === "ALL" || inc.severity === severityFilter;
     const matchesStatus = statusFilter === "ALL" || inc.status === statusFilter;
-    const matchesSearch = inc.vehicleId.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          inc.type.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          inc.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      inc.vehicleId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inc.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inc.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inc.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSeverity && matchesStatus && matchesSearch;
   });
+
+  // KPI Metrics
+  const totalCount = incidents.length;
+  const criticalCount = incidents.filter(i => (i.severity === "CRITICAL" || panicMode) && i.status !== "RESOLVED").length;
+  const activeCount = incidents.filter(i => i.status === "ACTIVE").length;
+  const resolvedCount = incidents.filter(i => i.status === "RESOLVED").length;
 
   // Mock CAN Bus dump for details
   const getMockCanBusDump = (vehicleId: string) => {
     return [
-      { id: "0x120", dlc: 8, data: "0F 00 22 C0 FF A2 03 EC", desc: language === "ko" ? `${vehicleId} 스티어링 각도 센서 (유효)` : `${vehicleId} Steering Angle Sensor (Valid)` },
-      { id: "0x13A", dlc: 8, data: "22 4A 10 00 A2 EE 12 00", desc: language === "ko" ? "휠 속도 텔레메트리" : "Wheel Speed Telemetry" },
+      { id: "0x120", dlc: 8, data: "0F 00 22 C0 FF A2 03 EC", desc: language === "ko" ? `${vehicleId} 스티어링 각도 센서 (정상)` : `${vehicleId} Steering Angle Sensor (Valid)` },
+      { id: "0x13A", dlc: 8, data: "22 4A 10 00 A2 EE 12 00", desc: language === "ko" ? "휠 회전 속도 텔레메트리" : "Wheel Speed Telemetry" },
       { id: "0x0A2", dlc: 4, data: "FF FF FF FF", desc: language === "ko" ? "임계: 브레이크 액추에이터 오버라이드 인젝션" : "CRITICAL: Brakes Actuator Override Injection", suspect: true },
       { id: "0x2C4", dlc: 8, data: "00 00 00 00 00 00 00 00", desc: language === "ko" ? "기어 위치 텔레메트리 (Null)" : "Gear Position Telemetry (Null)" },
     ];
   };
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in font-mono">
-      {/* Incident List panel (Left 2 Columns) */}
-      <div className="lg:col-span-2 flex flex-col space-y-4">
-        {/* Controls header */}
-        <div className="cyber-panel p-4 rounded space-y-3">
-          <div className="flex flex-col md:flex-row gap-3 justify-between">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-500" />
-              <input
-                type="text"
-                placeholder={t("incidents.search")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-zinc-950 border border-panel-border rounded pl-9 pr-4 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-600 transition-colors"
-              />
-            </div>
-            
-            {/* Severity Filters */}
-            <div className="flex gap-1.5 flex-wrap">
-              {["ALL", "CRITICAL", "HIGH", "MEDIUM", "INFO"].map((sev) => (
-                <button
-                  key={sev}
-                  onClick={() => setSeverityFilter(sev)}
-                  className={`px-2.5 py-1 rounded text-[10px] font-bold border transition-colors ${
-                    severityFilter === sev
-                      ? "bg-brand-cyan/15 text-brand-cyan border-brand-cyan"
-                      : "bg-zinc-900 text-zinc-400 border-panel-border hover:text-white"
-                  }`}
-                >
-                  {sev === "ALL" ? t("incidents.all") : t("incidents." + sev.toLowerCase() + "_sev")}
-                </button>
-              ))}
-            </div>
-          </div>
+  const getSeverityBadge = (severity: Incident["severity"]) => {
+    switch (severity) {
+      case "CRITICAL":
+        return {
+          label: language === "ko" ? "치명적 (CRITICAL)" : "CRITICAL",
+          classes: "text-brand-rose bg-brand-rose/10 border-brand-rose/30"
+        };
+      case "HIGH":
+        return {
+          label: language === "ko" ? "높음 (HIGH)" : "HIGH",
+          classes: "text-brand-amber bg-brand-amber/10 border-brand-amber/30"
+        };
+      case "MEDIUM":
+        return {
+          label: language === "ko" ? "중간 (MED)" : "MEDIUM",
+          classes: "text-brand-cyan bg-brand-cyan/10 border-brand-cyan/30"
+        };
+      default:
+        return {
+          label: language === "ko" ? "정보 (INFO)" : "INFO",
+          classes: "text-zinc-400 bg-zinc-500/10 border-panel-border"
+        };
+    }
+  };
 
-          <div className="flex justify-between items-center text-xs text-zinc-500 border-t border-panel-border/50 pt-2 flex-wrap gap-2">
-            <span>
-              {language === "ko" 
-                ? <>조회됨: <strong className="text-zinc-300">{filteredIncidents.length}</strong> 건의 일치하는 아노말리</> 
-                : <>SHOWING: <strong className="text-zinc-300">{filteredIncidents.length}</strong> anomalies matching rules</>
-              }
+  return (
+    <div className="space-y-4 animate-fade-in font-sans">
+      {/* ========================================================================= */}
+      {/* 1. TOP HEADER & INCIDENT METRICS BANNER                                    */}
+      {/* ========================================================================= */}
+      <div className="cyber-panel p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-brand-rose animate-pulse" />
+            <span className="text-[11px] text-[var(--muted-text)] font-bold uppercase tracking-wider">
+              {language === "ko" ? "차량 사이버 위협 탐지 센터" : "SDV CYBER THREAT & ANOMALY RESPONSE"}
             </span>
-            <div className="flex items-center gap-2">
-              <span>{t("incidents.status")}</span>
-              <div className="flex gap-1">
-                {["ALL", "ACTIVE", "TRIAGED", "RESOLVED"].map((stat) => (
-                  <button
-                    key={stat}
-                    onClick={() => setStatusFilter(stat)}
-                    className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                      statusFilter === stat
-                        ? "bg-zinc-800 text-white border border-zinc-700"
-                        : "bg-transparent text-zinc-500 hover:text-zinc-300"
-                    }`}
-                  >
-                    {stat === "ALL" ? t("incidents.all") : t("incidents." + stat.toLowerCase() + "_stat")}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
+          <h1 className="text-lg font-bold text-[var(--foreground)] mt-0.5">
+            {language === "ko" ? "실시간 보안 인시던트 관제 (Security Incidents)" : "Security Incidents & Anomaly Response"}
+          </h1>
+          <p className="text-xs text-[var(--muted-text)] mt-1">
+            {language === "ko"
+              ? "차량 내부 CAN 버스 및 V2X 네트워크에서 감지된 이상 패킷과 보안 위협을 실시간 추적하고 조치합니다."
+              : "Track, investigate, and triage CAN bus injection attacks, sensor dropouts, and anomalies across SDVs."}
+          </p>
         </div>
 
-        {/* Incidents Table / List */}
-        <div className="cyber-panel rounded overflow-hidden flex-1 max-h-[500px] overflow-y-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        {/* Real-time Telemetry Stats Pill */}
+        <div className="bg-[var(--panel-header-bg)] border border-panel-border px-3.5 py-2 rounded-md flex items-center gap-4 text-xs">
+          <div>
+            <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "총 감지" : "Total"}</span>
+            <span className="text-[var(--foreground)] font-bold tabular-nums">{totalCount}건</span>
+          </div>
+          <div className="w-[1px] h-6 bg-panel-border"></div>
+          <div>
+            <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "미조치 긴급" : "Critical"}</span>
+            <span className={`${criticalCount > 0 ? "text-brand-rose animate-pulse" : "text-brand-emerald"} font-bold tabular-nums`}>
+              {criticalCount}건
+            </span>
+          </div>
+          <div className="w-[1px] h-6 bg-panel-border"></div>
+          <div>
+            <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "조사 중" : "Active"}</span>
+            <span className="text-brand-amber font-bold tabular-nums">{activeCount}건</span>
+          </div>
+          <div className="w-[1px] h-6 bg-panel-border"></div>
+          <div>
+            <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "해결 완료" : "Resolved"}</span>
+            <span className="text-brand-emerald font-bold tabular-nums">{resolvedCount}건</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. SEARCH & DUAL-AXIS FILTERS TOOLBAR                                     */}
+      {/* ========================================================================= */}
+      <div className="cyber-panel p-3 rounded-lg flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+        {/* Search Input */}
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-[var(--muted-text)] absolute left-3 top-2.5" />
+          <input
+            type="text"
+            placeholder={t("incidents.search")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md pl-9 pr-3 py-2 text-xs text-[var(--foreground)] outline-none focus:border-brand-cyan transition-colors"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          {/* Severity Filters */}
+          <div className="flex gap-1">
+            {["ALL", "CRITICAL", "HIGH", "MEDIUM", "INFO"].map((sev) => (
+              <button
+                key={sev}
+                onClick={() => setSeverityFilter(sev)}
+                className={`px-2.5 py-1.5 rounded text-[11px] font-semibold whitespace-nowrap border transition-all ${
+                  severityFilter === sev
+                    ? "bg-brand-cyan/15 border-brand-cyan text-brand-cyan font-bold"
+                    : "bg-[var(--panel-header-bg)] border-panel-border text-[var(--muted-text)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {sev === "ALL" ? t("incidents.all") : t("incidents." + sev.toLowerCase() + "_sev")}
+              </button>
+            ))}
+          </div>
+
+          <div className="w-[1px] h-5 bg-panel-border"></div>
+
+          {/* Status Filters */}
+          <div className="flex gap-1">
+            {["ALL", "ACTIVE", "TRIAGED", "RESOLVED"].map((stat) => (
+              <button
+                key={stat}
+                onClick={() => setStatusFilter(stat)}
+                className={`px-2.5 py-1.5 rounded text-[11px] font-semibold whitespace-nowrap border transition-all ${
+                  statusFilter === stat
+                    ? "bg-brand-cyan/15 border-brand-cyan text-brand-cyan font-bold"
+                    : "bg-[var(--panel-header-bg)] border-panel-border text-[var(--muted-text)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {stat === "ALL" ? "전체" : t("incidents." + stat.toLowerCase() + "_stat")}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 3. FULL-WIDTH ENTERPRISE INCIDENTS DATA TABLE                             */}
+      {/* ========================================================================= */}
+      <div className="cyber-panel rounded-lg overflow-hidden border border-panel-border">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-zinc-950/80 border-b border-panel-border text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
-                <th className="p-3">{language === "ko" ? "인시던트 ID" : "Incident ID"}</th>
-                <th className="p-3">{language === "ko" ? "차량 ID" : "Vehicle"}</th>
-                <th className="p-3">{language === "ko" ? "보안 위협 유형" : "Security Threat Class"}</th>
-                <th className="p-3 text-center">{language === "ko" ? "심각도" : "Severity"}</th>
-                <th className="p-3 text-center">{language === "ko" ? "상태" : "Status"}</th>
-                <th className="p-3 text-right">{language === "ko" ? "감지됨" : "Detected"}</th>
+              <tr className="border-b border-panel-border bg-[var(--panel-header-bg)] text-[11px] font-bold text-[var(--muted-text)] uppercase tracking-wider">
+                <th className="py-3 px-4 w-12 text-center">ID</th>
+                <th className="py-3 px-4">{language === "ko" ? "대상 차량" : "Vehicle"}</th>
+                <th className="py-3 px-4">{language === "ko" ? "위협 유형 및 설명" : "Threat Class & Summary"}</th>
+                <th className="py-3 px-4 text-center">{language === "ko" ? "심각도" : "Severity"}</th>
+                <th className="py-3 px-4 text-center">{language === "ko" ? "상태" : "Status"}</th>
+                <th className="py-3 px-4 text-right">{language === "ko" ? "감지 시각" : "Timestamp"}</th>
+                <th className="py-3 px-4 text-right">{language === "ko" ? "조치 및 분석" : "Actions"}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-panel-border/50 bg-zinc-950/10">
-              {filteredIncidents.length === 0 ? (
+            <tbody className="divide-y divide-panel-border text-[var(--foreground)]">
+              {filteredIncidents.map((inc) => {
+                const isSelected = selectedIncident?.id === inc.id;
+                const isCrit = inc.severity === "CRITICAL" || panicMode;
+                const badge = getSeverityBadge(inc.severity);
+
+                return (
+                  <tr
+                    key={inc.id}
+                    onClick={() => setSelectedIncident(inc)}
+                    className={`cursor-pointer transition-colors group ${
+                      isSelected
+                        ? "bg-brand-cyan/10 hover:bg-brand-cyan/15"
+                        : "hover:bg-[var(--panel-header-bg)]"
+                    }`}
+                  >
+                    {/* ID */}
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-[11px] text-[var(--muted-text)] group-hover:text-brand-cyan">
+                      {inc.id}
+                    </td>
+
+                    {/* Vehicle */}
+                    <td className="py-3.5 px-4 font-mono font-bold text-xs text-[var(--foreground)]">
+                      <div className="flex items-center gap-1.5">
+                        <Car className="w-3.5 h-3.5 text-brand-cyan" />
+                        <span>{inc.vehicleId}</span>
+                      </div>
+                    </td>
+
+                    {/* Threat Class & Summary */}
+                    <td className="py-3.5 px-4">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          {isCrit && (
+                            <span className="w-2 h-2 rounded-full bg-brand-rose animate-ping shrink-0"></span>
+                          )}
+                          <span className="font-bold text-sm text-[var(--foreground)] group-hover:text-brand-cyan transition-colors">
+                            {inc.type}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[var(--muted-text)] truncate max-w-md">
+                          {inc.description}
+                        </p>
+                      </div>
+                    </td>
+
+                    {/* Severity */}
+                    <td className="py-3.5 px-4 text-center">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${badge.classes}`}>
+                        {badge.label}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td className="py-3.5 px-4 text-center">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                          inc.status === "ACTIVE"
+                            ? "text-brand-rose bg-brand-rose/10 border-brand-rose/30"
+                            : inc.status === "TRIAGED"
+                            ? "text-brand-amber bg-brand-amber/10 border-brand-amber/30"
+                            : "text-brand-emerald bg-brand-emerald/10 border-brand-emerald/30"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            inc.status === "ACTIVE"
+                              ? "bg-brand-rose animate-pulse"
+                              : inc.status === "TRIAGED"
+                              ? "bg-brand-amber"
+                              : "bg-brand-emerald"
+                          }`}
+                        ></span>
+                        {t("incidents." + inc.status.toLowerCase() + "_stat")}
+                      </span>
+                    </td>
+
+                    {/* Timestamp */}
+                    <td className="py-3.5 px-4 text-right font-mono text-xs tabular-nums text-[var(--muted-text)]">
+                      {inc.timestamp}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1.5">
+                        {inc.status !== "RESOLVED" && (
+                          <button
+                            onClick={() => handleUpdateStatus(inc.id, "RESOLVED")}
+                            className="p-1.5 rounded text-[var(--muted-text)] hover:text-brand-emerald hover:bg-brand-emerald/10 border border-panel-border transition-colors"
+                            title={language === "ko" ? "해결 처리" : "Resolve"}
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setSelectedIncident(inc)}
+                          className="p-1.5 rounded text-[var(--muted-text)] hover:text-brand-cyan hover:bg-brand-cyan/10 border border-panel-border transition-colors"
+                          title={language === "ko" ? "상세 조사 파일 (Drawer)" : "Open Dossier"}
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredIncidents.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-16 text-zinc-500 font-mono text-xs uppercase">
-                    {language === "ko" ? "선택한 필터 조건에 부합하는 활성 안전 인시던트가 없습니다" : "NO ACTIVE SAFETY INCIDENTS DETECTED FOR SELECTED FILTER CRITERIA"}
+                  <td colSpan={7} className="py-12 text-center text-xs text-[var(--muted-text)]">
+                    {language === "ko"
+                      ? "검색 조건에 부합하는 활성 보안 인시던트가 없습니다."
+                      : "No active security incidents match the filter criteria."}
                   </td>
                 </tr>
-              ) : (
-                filteredIncidents.map((inc) => {
-                  const isSelected = selectedIncident?.id === inc.id;
-                  const isCrit = inc.severity === "CRITICAL" || panicMode;
-                  
-                  return (
-                    <tr
-                      key={inc.id}
-                      onClick={() => setSelectedIncident(inc)}
-                      className={`cursor-pointer hover:bg-zinc-900/40 transition-colors ${
-                        isSelected ? "bg-zinc-900/70 border-l-2 border-brand-cyan" : ""
-                      }`}
-                    >
-                      <td className="p-3 font-bold text-zinc-300">{inc.id}</td>
-                      <td className="p-3 text-zinc-400">{inc.vehicleId}</td>
-                      <td className="p-3 font-bold text-white flex items-center gap-2">
-                        {isCrit && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-brand-rose animate-ping"></span>
-                        )}
-                        {inc.type}
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                          isCrit
-                            ? "text-brand-rose bg-brand-rose/10 border border-brand-rose/25"
-                            : inc.severity === "HIGH"
-                            ? "text-brand-amber bg-brand-amber/10 border border-brand-amber/25"
-                            : "text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/25"
-                        }`}>
-                          {t("incidents." + inc.severity.toLowerCase() + "_sev")}
-                        </span>
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] uppercase ${
-                          inc.status === "ACTIVE"
-                            ? "text-brand-rose animate-pulse"
-                            : inc.status === "TRIAGED"
-                            ? "text-brand-amber"
-                            : "text-zinc-500"
-                        }`}>
-                          {t("incidents." + inc.status.toLowerCase() + "_stat")}
-                        </span>
-                      </td>
-                      <td className="p-3 text-right text-zinc-500 text-[10px]">{inc.timestamp}</td>
-                    </tr>
-                  );
-                })
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Incident Details Sidebar Drawer (Right 1 Column) */}
-      <div className="flex flex-col">
-        {selectedIncident ? (
-          <div className="cyber-panel rounded flex flex-col flex-1 p-4 space-y-4 bg-zinc-950/40 relative overflow-hidden">
-            {/* Header info */}
-            <div className="border-b border-panel-border pb-3">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">{language === "ko" ? "인시던트 파일" : "Incident Dossier"}</span>
-                <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
-                  selectedIncident.status === "ACTIVE" ? "bg-brand-rose/20 text-brand-rose" : "bg-zinc-800 text-zinc-400"
-                }`}>
-                  {selectedIncident.id}
-                </span>
+      {/* ========================================================================= */}
+      {/* 4. INCIDENT INVESTIGATION DOSSIER SLIDE-OVER DRAWER                       */}
+      {/* ========================================================================= */}
+      {selectedIncident && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-fade-in"
+            onClick={() => setSelectedIncident(null)}
+          />
+
+          {/* Drawer Container */}
+          <div className="relative w-full max-w-xl bg-[var(--panel-bg)] border-l border-panel-border h-full shadow-2xl z-10 flex flex-col animate-slide-left">
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-start">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono uppercase text-brand-rose font-bold bg-brand-rose/10 px-2 py-0.5 rounded border border-brand-rose/20">
+                    {selectedIncident.id}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-brand-cyan flex items-center gap-1">
+                    <Car className="w-3 h-3" />
+                    {selectedIncident.vehicleId}
+                  </span>
+                  <span className="text-[10px] text-[var(--muted-text)] font-mono">
+                    {selectedIncident.timestamp}
+                  </span>
+                </div>
+                <h2 className="text-base font-bold text-[var(--foreground)] mt-1.5 flex items-center gap-2">
+                  <AlertTriangle className={`w-4 h-4 ${
+                    selectedIncident.severity === "CRITICAL" ? "text-brand-rose animate-pulse" : "text-brand-amber"
+                  }`} />
+                  <span>{selectedIncident.type}</span>
+                </h2>
               </div>
-              <h2 className="text-sm font-bold text-white mt-1.5 flex items-center gap-1.5">
-                <AlertTriangle className={`w-4 h-4 ${
-                  selectedIncident.severity === "CRITICAL" ? "text-brand-rose animate-pulse" : "text-brand-amber"
-                }`} />
-                {selectedIncident.type}
-              </h2>
-              <span className="text-[10px] text-zinc-400 block mt-1">
-                {language === "ko" ? "영향을 받는 차량:" : "AFFECTED INSTANCE:"} <strong className="text-brand-cyan">{selectedIncident.vehicleId}</strong>
-              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedIncident(null)}
+                  className="p-1.5 rounded text-[var(--muted-text)] hover:text-[var(--foreground)] hover:bg-[var(--panel-header-bg)] border border-panel-border transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Description detail */}
-            <div className="text-xs bg-zinc-900/50 p-3 rounded border border-panel-border text-zinc-300 leading-relaxed font-mono">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">{language === "ko" ? "상세 설명" : "Description"}</span>
-              {selectedIncident.description}
-            </div>
+            {/* Drawer Body (Scrollable) */}
+            <div className="p-5 space-y-5 overflow-y-auto flex-1 scrollbar-thin">
+              {/* Threat Key Indicators Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <div className="bg-[var(--panel-header-bg)] p-3 rounded border border-panel-border">
+                  <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "위협 심각도" : "Severity"}</span>
+                  <span className={`font-bold mt-0.5 block ${selectedIncident.severity === "CRITICAL" ? "text-brand-rose" : "text-brand-amber"}`}>
+                    {selectedIncident.severity}
+                  </span>
+                </div>
+                <div className="bg-[var(--panel-header-bg)] p-3 rounded border border-panel-border">
+                  <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "현재 조치 상태" : "Triage State"}</span>
+                  <span className="font-bold text-[var(--foreground)] mt-0.5 block">{selectedIncident.status}</span>
+                </div>
+                <div className="bg-[var(--panel-header-bg)] p-3 rounded border border-panel-border">
+                  <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "영향받는 SDV" : "Target Vehicle"}</span>
+                  <span className="font-bold text-brand-cyan mt-0.5 block font-mono">{selectedIncident.vehicleId}</span>
+                </div>
+                <div className="bg-[var(--panel-header-bg)] p-3 rounded border border-panel-border">
+                  <span className="text-[9px] text-[var(--muted-text)] uppercase block">{language === "ko" ? "초기 탐지" : "First Seen"}</span>
+                  <span className="font-bold text-[var(--foreground)] mt-0.5 block font-mono">{selectedIncident.timestamp}</span>
+                </div>
+              </div>
 
-            {/* Investigation Notes Form */}
-            <div className="space-y-2 border-t border-panel-border pt-3">
-              <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">
-                {t("incidents.notes_label")}
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder={t("incidents.notes_placeholder")}
-                rows={3}
-                className="w-full bg-zinc-950 border border-panel-border rounded p-2 text-xs text-zinc-200 outline-none focus:border-zinc-700 resize-none font-mono"
-              />
-              <button
-                onClick={() => {
-                  if (!notes.trim() || !selectedIncident) return;
-                  const newNote = {
-                    operator: "Alex S. (SOC Operator)",
-                    text: notes,
-                    time: "Just now"
-                  };
-                  setNotesHistory(prev => ({
-                    ...prev,
-                    [selectedIncident.id]: [newNote, ...(prev[selectedIncident.id] || [])]
-                  }));
-                  setNotes("");
-                }}
-                className="w-full p-2 bg-zinc-900 border border-panel-border hover:border-zinc-700 text-zinc-300 hover:text-white text-[10px] font-bold uppercase rounded transition-all tracking-wider text-center"
-              >
-                {t("incidents.notes_save")}
-              </button>
-            </div>
-
-            {/* Investigation Notes History */}
-            {notesHistory[selectedIncident.id] && notesHistory[selectedIncident.id].length > 0 && (
-              <div className="space-y-2 border-t border-panel-border pt-3">
-                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">
-                  {language === "ko" ? "조사 로그 기록" : "Investigation History Log"}
+              {/* Description Box */}
+              <div className="bg-[var(--panel-header-bg)] p-3.5 rounded-lg border border-panel-border space-y-1">
+                <span className="text-[10px] text-[var(--muted-text)] font-bold uppercase tracking-wider block">
+                  {language === "ko" ? "인시던트 상세 분석 보고" : "Detailed Telematics Synopsis"}
                 </span>
-                <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
-                  {notesHistory[selectedIncident.id].map((note, index) => (
-                    <div key={index} className="bg-zinc-900/30 border border-panel-border/50 p-2 rounded text-[10px] space-y-1 font-mono text-zinc-300">
-                      <div className="flex justify-between text-[8px] text-zinc-500 font-bold">
-                        <span>{note.operator}</span>
-                        <span>{note.time}</span>
+                <p className="text-xs text-[var(--foreground)] leading-relaxed font-mono">
+                  {selectedIncident.description}
+                </p>
+              </div>
+
+              {/* Raw OB-CAN Bus Ingress Frame */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-[var(--foreground)] flex items-center gap-1.5">
+                    <Terminal className="w-4 h-4 text-brand-cyan" />
+                    <span>{language === "ko" ? "원시 OB-CAN 버스 수신 프레임 덤프" : "Raw OB-CAN Ingress Frame Dump"}</span>
+                  </span>
+                  <span className="text-[10px] text-brand-rose font-bold bg-brand-rose/10 border border-brand-rose/20 px-2 py-0.5 rounded animate-pulse">
+                    ANOMALY PACKET DETECTED
+                  </span>
+                </div>
+
+                <div className="p-3 bg-[var(--input-bg)] border border-panel-border rounded-lg space-y-2 font-mono text-[11px] max-h-[160px] overflow-y-auto scrollbar-thin">
+                  {getMockCanBusDump(selectedIncident.vehicleId).map((frame, index) => (
+                    <div
+                      key={index}
+                      className={`p-2 rounded border ${
+                        frame.suspect
+                          ? "bg-brand-rose/10 border-brand-rose/40 text-brand-rose shadow-xs"
+                          : "border-panel-border/40 text-[var(--muted-text)]"
+                      }`}
+                    >
+                      <div className="flex justify-between font-bold text-xs">
+                        <span>{frame.id} (DLC: {frame.dlc})</span>
+                        <span className="text-[9px] font-normal uppercase">{frame.desc}</span>
                       </div>
-                      <p className="leading-relaxed whitespace-pre-wrap">{note.text}</p>
+                      <div className="text-xs tracking-widest font-bold mt-1 text-[var(--foreground)]">
+                        {frame.data}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Raw Security Payload (CAN bus frame dump) */}
-            <div className="flex-1 flex flex-col min-h-[160px] bg-black border border-panel-border rounded p-3 text-[10px] font-mono">
-              <div className="flex justify-between items-center text-zinc-500 border-b border-panel-border pb-1.5 mb-2 font-bold">
-                <span className="flex items-center gap-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-brand-cyan" />
-                  {language === "ko" ? "원시 OB-CAN 버스 수신 프레임" : "RAW OB-CAN BUS INGRESS FRAME"}
-                </span>
-                <span className="text-brand-rose animate-pulse">{language === "ko" ? "이상 분석: 임계치 초과" : "ANOMALY HIGH"}</span>
-              </div>
-              
-              <div className="space-y-1 overflow-y-auto flex-1 max-h-[140px] text-zinc-400">
-                {getMockCanBusDump(selectedIncident.vehicleId).map((frame, index) => (
-                  <div 
-                    key={index}
-                    className={`p-1.5 rounded flex flex-col gap-0.5 border ${
-                      frame.suspect 
-                        ? "bg-brand-rose/5 border-brand-rose/20 text-brand-rose" 
-                        : "border-transparent text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex justify-between font-bold">
-                      <span>{frame.id} (DLC: {frame.dlc})</span>
-                      <span className="text-[8px] font-normal uppercase opacity-75">{frame.desc}</span>
-                    </div>
-                    <div className="text-xs tracking-wider font-semibold font-mono whitespace-nowrap overflow-x-auto">
-                      {frame.data}
-                    </div>
+              {/* Operator Notes Form & History */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-[var(--foreground)] flex items-center gap-1.5">
+                    <MessageSquare className="w-4 h-4 text-brand-cyan" />
+                    <span>{t("incidents.notes_label")}</span>
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder={t("incidents.notes_placeholder")}
+                    rows={2}
+                    className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md p-2.5 text-xs text-[var(--foreground)] outline-none focus:border-brand-cyan resize-none font-mono"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => {
+                        if (!notes.trim() || !selectedIncident) return;
+                        const newNote = {
+                          operator: "Alex S. (SOC Operator)",
+                          text: notes,
+                          time: "Just now"
+                        };
+                        setNotesHistory(prev => ({
+                          ...prev,
+                          [selectedIncident.id]: [newNote, ...(prev[selectedIncident.id] || [])]
+                        }));
+                        setNotes("");
+                      }}
+                      className="px-4 py-1.5 bg-[var(--panel-header-bg)] border border-panel-border hover:border-brand-cyan text-[var(--foreground)] text-xs font-bold rounded transition-colors flex items-center gap-1.5"
+                    >
+                      <Send className="w-3 h-3" />
+                      <span>{t("incidents.notes_save")}</span>
+                    </button>
                   </div>
-                ))}
+                </div>
+
+                {/* Notes History list */}
+                {notesHistory[selectedIncident.id] && notesHistory[selectedIncident.id].length > 0 && (
+                  <div className="space-y-1.5 max-h-[120px] overflow-y-auto pr-1 scrollbar-thin">
+                    {notesHistory[selectedIncident.id].map((note, index) => (
+                      <div key={index} className="bg-[var(--panel-header-bg)] border border-panel-border p-2.5 rounded-md text-[11px] font-mono text-[var(--foreground)]">
+                        <div className="flex justify-between text-[9px] text-[var(--muted-text)] font-bold mb-0.5">
+                          <span>{note.operator}</span>
+                          <span>{note.time}</span>
+                        </div>
+                        <p className="leading-relaxed whitespace-pre-wrap">{note.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Safety Dispatch Actions Buttons */}
-            <div className="space-y-2 border-t border-panel-border pt-4">
-              <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">{language === "ko" ? "대응 및 관제 제어" : "DISPATCH RESPONSE CONTROL"}</span>
-              
-              <div className="grid grid-cols-2 gap-2">
-                {selectedIncident.status === "ACTIVE" && (
-                  <button 
-                    onClick={() => handleUpdateStatus(selectedIncident.id, "TRIAGED")}
-                    className="flex items-center justify-center gap-1.5 p-2 rounded bg-brand-amber/10 border border-brand-amber/30 text-brand-amber text-[10px] font-bold uppercase hover:bg-brand-amber/25 transition-all"
-                  >
-                    <Sliders className="w-3.5 h-3.5" />
-                    {language === "ko" ? "조사 중 표시" : "TRIAGE ALERT"}
-                  </button>
-                )}
-
-                {selectedIncident.status !== "RESOLVED" && (
-                  <button 
-                    onClick={() => handleUpdateStatus(selectedIncident.id, "RESOLVED")}
-                    className="flex items-center justify-center gap-1.5 p-2 rounded bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-[10px] font-bold uppercase hover:bg-brand-emerald/25 transition-all"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    {language === "ko" ? "인시던트 해결" : "RESOLVE ALERT"}
-                  </button>
-                )}
+            {/* Drawer Footer Actions */}
+            <div className="p-4 border-t border-panel-border bg-[var(--panel-header-bg)] space-y-2.5">
+              {/* Emergency Stop Override Trigger */}
+              <div className="border border-brand-rose/30 bg-brand-rose/5 rounded-lg p-2.5 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-brand-rose animate-pulse shrink-0" />
+                  <div>
+                    <span className="text-[11px] font-bold text-[var(--foreground)] block">
+                      {language === "ko" ? "페일세이프 비상 브레이크 전송" : "Fail-Safe Remote Emergency Brake"}
+                    </span>
+                    <span className="text-[10px] text-[var(--muted-text)]">
+                      V2X encrypted killswitch for {selectedIncident.vehicleId}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert(`CRITICAL EMERGENCY SIGNAL BROADCAST TO ${selectedIncident.vehicleId}: FORCING EMERGENCY STOP.`)}
+                  className="px-3 py-1.5 bg-brand-rose hover:opacity-90 text-white font-bold text-xs rounded transition-opacity shrink-0"
+                >
+                  {language === "ko" ? "비상 정지" : "EMERGENCY STOP"}
+                </button>
               </div>
 
-              {/* Dangerous Override Triggers */}
-              <div className="border border-brand-rose/25 bg-brand-rose/5 rounded p-2.5 space-y-2">
-                <span className="text-[8px] text-brand-rose font-bold uppercase tracking-widest block flex items-center gap-1">
-                  <ShieldAlert className="w-3 h-3 animate-pulse" /> {language === "ko" ? "안전 장치 오버라이드 (즉시 가동)" : "FAIL-SAFE OVERRIDES (IMMEDIATE DEPLOY)"}
-                </span>
-                
-                <div className="grid grid-cols-1 gap-1.5">
-                  <button 
-                    onClick={() => alert(`CRITICAL EMERGENCY SIGNAL BROADCAST TO ${selectedIncident.vehicleId}: FORCING EMERGENCY STOP.`)}
-                    className="w-full p-2 bg-brand-rose text-black text-[9px] font-bold uppercase hover:bg-brand-rose/80 rounded transition-all tracking-wider text-center"
-                  >
-                    {language === "ko" ? "비상 정지 명령 전송 (안전 정지)" : "FORCE EMERGENCY STOP (VEH SAFE-STOP)"}
-                  </button>
+              {/* Status Triage Controls */}
+              <div className="flex justify-between items-center pt-1">
+                <button
+                  onClick={() => setSelectedIncident(null)}
+                  className="px-4 py-2 rounded-md border border-panel-border bg-[var(--panel-bg)] hover:bg-[var(--panel-header-bg)] text-[var(--foreground)] text-xs font-semibold transition-colors"
+                >
+                  {language === "ko" ? "닫기 (Esc)" : "Close (Esc)"}
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {selectedIncident.status === "ACTIVE" && (
+                    <button
+                      onClick={() => handleUpdateStatus(selectedIncident.id, "TRIAGED")}
+                      className="px-4 py-2 rounded-md bg-brand-amber/15 border border-brand-amber/40 text-brand-amber hover:bg-brand-amber hover:text-black text-xs font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <Sliders className="w-3.5 h-3.5" />
+                      <span>{language === "ko" ? "조사 중으로 변경" : "Mark Triaged"}</span>
+                    </button>
+                  )}
+
+                  {selectedIncident.status !== "RESOLVED" && (
+                    <button
+                      onClick={() => handleUpdateStatus(selectedIncident.id, "RESOLVED")}
+                      className="px-4 py-2 rounded-md bg-brand-emerald hover:opacity-90 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm"
+                    >
+                      <Check className="w-3.5 h-3.5 stroke-[2.5px]" />
+                      <span>{language === "ko" ? "인시던트 해결" : "Resolve Incident"}</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="cyber-panel rounded flex-1 flex flex-col items-center justify-center p-8 text-zinc-500 text-xs text-center border-dashed">
-            <Info className="w-8 h-8 text-zinc-600 mb-2" />
-            <span>{language === "ko" ? "보안 목록에서 인시던트를 선택하여 원시 페이로드를 검사하고 비상 대책을 가동하십시오." : "Select an incident from the security roster to inspect raw payload and dispatch fail-safes."}</span>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
+

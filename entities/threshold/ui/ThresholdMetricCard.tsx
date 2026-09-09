@@ -15,12 +15,12 @@ export const ThresholdMetricCard: React.FC<ThresholdMetricCardProps> = ({
   const critVal = rule[metric.critKey] as number;
 
   return (
-    <div className="cyber-panel p-3.5 rounded space-y-2.5 font-mono bg-zinc-950/40 border-panel-border hover:border-zinc-700 transition-colors">
+    <div className="cyber-panel p-3.5 rounded space-y-2.5 font-mono bg-[var(--panel-bg)] border-panel-border hover:border-panel-border-hover transition-colors">
       {/* Metric Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Activity className="w-3.5 h-3.5 text-brand-cyan" />
-          <span className="text-xs font-bold text-white uppercase tracking-wide">
+          <span className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wide">
             {metric.name}
           </span>
         </div>
@@ -38,7 +38,7 @@ export const ThresholdMetricCard: React.FC<ThresholdMetricCardProps> = ({
 
       {/* Visual threshold band bar */}
       <div className="space-y-1">
-        <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden flex border border-panel-border/80">
+        <div className="h-2 w-full bg-[var(--panel-header-bg)] rounded-full overflow-hidden flex border border-panel-border/80">
           {metric.invertCrit ? (
             <>
               {/* Critical is at lower values (e.g. Battery, LiDAR) */}

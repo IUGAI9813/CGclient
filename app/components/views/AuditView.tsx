@@ -62,7 +62,7 @@ export default function AuditView() {
   return (
     <div className="space-y-4 animate-fade-in font-mono">
       {/* Search Header Controls */}
-      <div className="cyber-panel p-4 rounded space-y-3 bg-zinc-950/20">
+      <div className="cyber-panel p-4 rounded space-y-3 bg-[var(--panel-bg)]">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-500" />
@@ -71,7 +71,7 @@ export default function AuditView() {
               placeholder={t("audit.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-950 border border-panel-border rounded pl-9 pr-4 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-600 transition-colors"
+              className="w-full bg-[var(--input-bg)] border border-panel-border rounded pl-9 pr-4 py-2 text-xs text-[var(--foreground)] outline-none focus:border-panel-border-hover transition-colors"
             />
           </div>
 
@@ -84,7 +84,7 @@ export default function AuditView() {
                   className={`px-2.5 py-1.5 rounded text-[10px] font-bold border transition-colors ${
                     levelFilter === lvl
                       ? "bg-brand-cyan/15 text-brand-cyan border-brand-cyan"
-                      : "bg-zinc-900 text-zinc-400 border-panel-border hover:text-white"
+                      : "bg-[var(--panel-header-bg)] text-zinc-500 border-panel-border hover:text-[var(--foreground)]"
                   }`}
                 >
                   {lvl === "ALL" 
@@ -98,7 +98,7 @@ export default function AuditView() {
             
             <button 
               onClick={() => alert(language === "ko" ? "암호 검증된 CSV 감사 로그 다운로드를 준비 중입니다..." : "Preparing cryptographically signed CSV audit download...")}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-panel-border hover:border-zinc-700 text-zinc-300 hover:text-white rounded text-[10px] font-bold uppercase transition-all whitespace-nowrap ml-auto"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--panel-header-bg)] border border-panel-border hover:border-panel-border-hover text-[var(--foreground)] rounded text-[10px] font-bold uppercase transition-all whitespace-nowrap ml-auto"
             >
               <Download className="w-3.5 h-3.5" />
               {t("audit.export")}
@@ -109,10 +109,10 @@ export default function AuditView() {
 
       {/* Main Audit Logs Table */}
       <div className="cyber-panel rounded overflow-hidden">
-        <div className="p-3 border-b border-panel-border bg-zinc-950 flex justify-between items-center">
+        <div className="p-3 border-b border-panel-border bg-[var(--panel-header-bg)] flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-brand-cyan" />
-            <span className="text-xs font-bold text-white tracking-widest uppercase">{t("audit.title")}</span>
+            <span className="text-xs font-bold text-[var(--foreground)] tracking-widest uppercase">{t("audit.title")}</span>
           </div>
           <span className="text-[9px] text-zinc-500 font-semibold flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" /> {t("audit.subtitle")}
@@ -122,7 +122,7 @@ export default function AuditView() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-zinc-950/70 border-b border-panel-border text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
+              <tr className="bg-[var(--panel-header-bg)] border-b border-panel-border text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
                 <th className="p-3">{t("audit.col_id")}</th>
                 <th className="p-3">{t("audit.col_time")}</th>
                 <th className="p-3">{t("audit.col_level")}</th>
@@ -132,7 +132,7 @@ export default function AuditView() {
                 <th className="p-3 text-right">{t("audit.col_hash")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-panel-border/30 bg-zinc-950/5">
+            <tbody className="divide-y divide-panel-border/30 bg-transparent">
               {filteredLogs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-zinc-500">
@@ -141,16 +141,16 @@ export default function AuditView() {
                 </tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-zinc-900/30 transition-colors">
-                    <td className="p-3 font-bold text-zinc-400">{log.id}</td>
+                  <tr key={log.id} className="hover:bg-[var(--panel-header-bg)] transition-colors">
+                    <td className="p-3 font-bold text-[var(--foreground)]">{log.id}</td>
                     <td className="p-3 text-zinc-500 tabular-nums">{log.time}</td>
                     <td className="p-3">
                       <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold border ${getLevelColor(log.level)}`}>
                         {language === "ko" ? (log.level === "SECURITY" ? "보안" : log.level === "ERROR" ? "에러" : log.level === "WARN" ? "경고" : "정보") : log.level}
                       </span>
                     </td>
-                    <td className="p-3 font-semibold text-zinc-300">{log.actor}</td>
-                    <td className="p-3 text-white max-w-xs truncate" title={log.action}>
+                    <td className="p-3 font-semibold text-[var(--foreground)]">{log.actor}</td>
+                    <td className="p-3 text-[var(--foreground)] max-w-xs truncate" title={log.action}>
                       {getTranslatedAction(log.action)}
                     </td>
                     <td className="p-3 text-zinc-500">{log.source}</td>
@@ -161,10 +161,10 @@ export default function AuditView() {
                         onMouseLeave={() => setHoveredHash(null)}
                       >
                         <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
-                        <span className="text-[10px] text-zinc-600 font-mono underline hover:text-brand-emerald">{log.hash}...</span>
+                        <span className="text-[10px] text-zinc-500 font-mono underline hover:text-brand-emerald">{log.hash}...</span>
                         
                         {hoveredHash === log.id && (
-                          <div className="absolute right-3 bottom-8 bg-zinc-900 border border-zinc-700 rounded p-2 text-[9px] w-48 shadow-xl text-left z-20 text-zinc-300 font-mono">
+                          <div className="absolute right-3 bottom-8 bg-[var(--panel-bg)] border border-panel-border rounded p-2 text-[9px] w-48 shadow-xl text-left z-20 text-[var(--foreground)] font-mono">
                             <div className="text-brand-emerald font-bold border-b border-panel-border pb-1 mb-1">
                               &bull; {language === "ko" ? "서명 검증 완료" : "Signature Verified"}
                             </div>
@@ -186,7 +186,7 @@ export default function AuditView() {
       </div>
 
       {/* Retro CLI log viewer mock container at the bottom */}
-      <div className="cyber-panel p-4 rounded bg-black/60 space-y-2">
+      <div className="cyber-panel p-4 rounded bg-[var(--panel-bg)] space-y-2">
         <div className="flex items-center gap-2 border-b border-panel-border pb-2 text-zinc-500 text-[10px]">
           <Terminal className="w-4 h-4 text-brand-cyan" />
           <span>{language === "ko" ? "코어가드 실시간 암호화 시스템 로그 스트림 [TLS 1.3]" : "COREGUARD LIVE ENCRYPTED SYSLOG STREAM [TLS 1.3]"}</span>

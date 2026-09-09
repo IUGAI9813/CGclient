@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ShieldAlert } from "lucide-react";
 import ConsoleLayout from "./components/ConsoleLayout";
 import DashboardView from "./components/views/DashboardView";
 import IncidentsView from "./components/views/IncidentsView";
@@ -11,6 +12,7 @@ import GatewayView from "./components/views/GatewayView";
 import IamAuthView from "./components/views/IamAuthView";
 import ThresholdsView from "./components/views/ThresholdsView";
 import PoliciesView from "./components/views/PoliciesView";
+import { useRbac } from "./components/RbacContext";
 
 interface Incident {
   id: string;
@@ -23,6 +25,7 @@ interface Incident {
 }
 
 export default function Home() {
+  const { canAccessTab, currentRole } = useRbac();
   const [activeTab, setActiveTab] = useState<string>("dashboard");
   const [threatLevel, setThreatLevel] = useState<"NORMAL" | "ELEVATED" | "CRITICAL">("ELEVATED");
   const [panicMode, setPanicMode] = useState<boolean>(false);
@@ -78,6 +81,33 @@ export default function Home() {
   };
 
   const renderContent = () => {
+    if (!canAccessTab(activeTab)) {
+      return (
+        <div className="cyber-panel p-8 rounded flex flex-col items-center justify-center text-center max-w-xl mx-auto my-12 space-y-4 font-mono border border-brand-rose/40">
+          <div className="p-3 bg-brand-rose/10 border border-brand-rose/30 rounded-full text-brand-rose">
+            <ShieldAlert className="w-8 h-8 animate-pulse" />
+          </div>
+          <div>
+            <span className="text-[10px] text-brand-rose font-bold uppercase tracking-widest block">
+              HTTP 403 // INSUFFICIENT OPERATOR CLEARANCE
+            </span>
+            <h2 className="text-base font-bold text-white mt-1">
+              Access Restricted for {currentRole.toUpperCase()} Role
+            </h2>
+          </div>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            Your active role credentials do not possess authorization to view or configure the 
+            <strong className="text-white"> /{activeTab}</strong> console subsystem.
+          </p>
+          <button
+            onClick={() => setActiveTab("dashboard")}
+            className="px-4 py-2 bg-zinc-900 border border-panel-border hover:border-zinc-700 text-xs text-white rounded font-bold uppercase transition-all cursor-pointer"
+          >
+            Return to Authorized Dashboard
+          </button>
+        </div>
+      );
+    }
     switch (activeTab) {
       case "dashboard":
         return (

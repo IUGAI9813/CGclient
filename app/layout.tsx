@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { LanguageProvider } from "./components/LanguageContext";
+import { RbacProvider } from "./components/RbacContext";
+import { AuthProvider } from "./components/AuthContext";
+import { ThemeProvider } from "./components/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,11 +29,25 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <LanguageProvider>{children}</LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <RbacProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </RbacProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

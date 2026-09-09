@@ -7,16 +7,13 @@ import {
   Activity, 
   Compass, 
   TrendingUp, 
-  Cpu, 
   Radio, 
   Zap, 
-  MapPin, 
   ArrowUpRight, 
   CheckCircle2,
   AlertCircle,
   Network,
-  KeyRound,
-  Lock
+  KeyRound
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 
@@ -31,7 +28,7 @@ interface Incident {
 }
 
 interface DashboardViewProps {
-  onNavigateToTab: (tab: string, itemData?: any) => void;
+  onNavigateToTab: (tab: string, itemData?: Incident) => void;
   incidents: Incident[];
   panicMode: boolean;
 }

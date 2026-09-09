@@ -6,10 +6,7 @@ import {
   Search, 
   Download, 
   ShieldCheck, 
-  Terminal, 
-  ExternalLink,
-  ChevronRight,
-  Filter
+  Terminal 
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 

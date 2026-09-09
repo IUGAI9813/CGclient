@@ -8,17 +8,14 @@ import {
   Compass, 
   FileText, 
   Settings, 
-  Search, 
   Bell, 
-  Clock, 
-  Power, 
   Wifi, 
   ChevronRight, 
   MapPin, 
-  Lock,
-  Database,
-  Network,
-  KeyRound
+  Network, 
+  KeyRound, 
+  SlidersHorizontal, 
+  ShieldCheck 
 } from "lucide-react";
 import { useLanguage } from "./LanguageContext";
 
@@ -67,6 +64,8 @@ export default function ConsoleLayout({
     { id: "gateway", label: t("nav.gateway"), icon: Network, badge: "6/6 UP", badgeColor: "bg-brand-emerald" },
     { id: "iam", label: t("nav.iam"), icon: KeyRound, badge: "OIDC", badgeColor: "bg-brand-cyan" },
     { id: "incidents", label: t("nav.incidents"), icon: AlertTriangle, badge: incidentCount > 0 ? incidentCount : null, badgeColor: "bg-brand-rose" },
+    { id: "thresholds", label: t("nav.thresholds"), icon: SlidersHorizontal, badge: "RULES", badgeColor: "bg-brand-cyan" },
+    { id: "policies", label: t("nav.policies"), icon: ShieldCheck, badge: "GEOZONES", badgeColor: "bg-brand-cyan" },
     { id: "fleet", label: t("nav.fleet"), icon: Compass, badge: "148/150", badgeColor: "bg-brand-cyan" },
     { id: "audit", label: t("nav.audit"), icon: FileText, badge: null },
     { id: "settings", label: t("nav.settings"), icon: Settings, badge: null },

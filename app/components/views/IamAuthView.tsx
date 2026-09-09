@@ -8,16 +8,8 @@ import {
   Fingerprint, 
   FileCode, 
   CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
-  RefreshCw, 
   Copy, 
-  Plus, 
-  Trash2, 
-  Shield, 
-  Sliders,
-  ExternalLink,
-  Search
+  Plus 
 } from "lucide-react";
 
 export default function IamAuthView() {
@@ -34,7 +26,7 @@ export default function IamAuthView() {
   const [selectedProfile, setSelectedProfile] = useState<"dispatcher" | "vehicle_device">("dispatcher");
 
   // OAuth 2.0 Registered Clients
-  const [oauthClients, setOauthClients] = useState([
+  const [oauthClients] = useState([
     {
       id: "client-soc-portal",
       name: "42dot Gangnam SOC Command Console",
@@ -126,7 +118,7 @@ export default function IamAuthView() {
       const header = JSON.parse(atob(parts[0]));
       const payload = JSON.parse(atob(parts[1]));
       return { header, payload, isValid: true };
-    } catch (e) {
+    } catch {
       return {
         header: { alg: "RS256", typ: "JWT", kid: "42dot-kms-soc-auth-2026" },
         payload: {

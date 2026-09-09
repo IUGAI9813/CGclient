@@ -4,17 +4,11 @@ import React, { useState, useEffect } from "react";
 import { 
   AlertTriangle, 
   Search, 
-  Filter, 
-  Play, 
   Check, 
-  Trash2, 
   Terminal, 
   ShieldAlert, 
   Sliders, 
-  Info,
-  ChevronRight,
-  Eye,
-  AlertCircle
+  Info 
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 
@@ -61,12 +55,16 @@ export default function IncidentsView({
   // Sync with incident selected from Dashboard
   useEffect(() => {
     if (selectedIncidentFromDashboard) {
-      setSelectedIncident(selectedIncidentFromDashboard);
-      clearSelectedIncidentFromDashboard();
+      queueMicrotask(() => {
+        setSelectedIncident(selectedIncidentFromDashboard);
+        clearSelectedIncidentFromDashboard();
+      });
     } else if (!selectedIncident && incidents.length > 0) {
-      setSelectedIncident(incidents[0]);
+      queueMicrotask(() => {
+        setSelectedIncident(incidents[0]);
+      });
     }
-  }, [selectedIncidentFromDashboard, incidents]);
+  }, [selectedIncidentFromDashboard, incidents, clearSelectedIncidentFromDashboard, selectedIncident]);
 
   const handleUpdateStatus = (id: string, newStatus: "ACTIVE" | "TRIAGED" | "RESOLVED") => {
     setIncidents(prev => prev.map(inc => inc.id === id ? { ...inc, status: newStatus } : inc));
@@ -88,7 +86,7 @@ export default function IncidentsView({
   // Mock CAN Bus dump for details
   const getMockCanBusDump = (vehicleId: string) => {
     return [
-      { id: "0x120", dlc: 8, data: "0F 00 22 C0 FF A2 03 EC", desc: language === "ko" ? "스티어링 각도 센서 (유효)" : "Steering Angle Sensor (Valid)" },
+      { id: "0x120", dlc: 8, data: "0F 00 22 C0 FF A2 03 EC", desc: language === "ko" ? `${vehicleId} 스티어링 각도 센서 (유효)` : `${vehicleId} Steering Angle Sensor (Valid)` },
       { id: "0x13A", dlc: 8, data: "22 4A 10 00 A2 EE 12 00", desc: language === "ko" ? "휠 속도 텔레메트리" : "Wheel Speed Telemetry" },
       { id: "0x0A2", dlc: 4, data: "FF FF FF FF", desc: language === "ko" ? "임계: 브레이크 액추에이터 오버라이드 인젝션" : "CRITICAL: Brakes Actuator Override Injection", suspect: true },
       { id: "0x2C4", dlc: 8, data: "00 00 00 00 00 00 00 00", desc: language === "ko" ? "기어 위치 텔레메트리 (Null)" : "Gear Position Telemetry (Null)" },

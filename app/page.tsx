@@ -9,6 +9,8 @@ import AuditView from "./components/views/AuditView";
 import SettingsView from "./components/views/SettingsView";
 import GatewayView from "./components/views/GatewayView";
 import IamAuthView from "./components/views/IamAuthView";
+import ThresholdsView from "./components/views/ThresholdsView";
+import PoliciesView from "./components/views/PoliciesView";
 
 interface Incident {
   id: string;
@@ -68,7 +70,7 @@ export default function Home() {
 
   const activeIncidentsCount = incidents.filter(i => i.status === "ACTIVE").length;
 
-  const handleDashboardNavigate = (tab: string, itemData?: any) => {
+  const handleDashboardNavigate = (tab: string, itemData?: Incident) => {
     if (itemData) {
       setSelectedIncidentFromDashboard(itemData);
     }
@@ -99,6 +101,10 @@ export default function Home() {
             panicMode={panicMode}
           />
         );
+      case "thresholds":
+        return <ThresholdsView />;
+      case "policies":
+        return <PoliciesView />;
       case "fleet":
         return <FleetView panicMode={panicMode} />;
       case "audit":

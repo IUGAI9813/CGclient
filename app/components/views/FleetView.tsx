@@ -6,19 +6,27 @@ import {
   Search, 
   Battery, 
   Cpu, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Activity, 
   RefreshCw, 
-  Filter,
-  Shield,
-  Gauge,
-  Sliders,
-  Trash2,
-  MapPin,
-  ShieldAlert
+  Gauge, 
+  Sliders, 
+  Trash2, 
+  MapPin 
 } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
+
+interface FleetVehicle {
+  id: string;
+  type: string;
+  status: string;
+  battery: number;
+  speed: number;
+  lidar: string;
+  radar: string;
+  camera: string;
+  ota: string;
+  location: string;
+  speedLimit: number;
+}
 
 interface FleetViewProps {
   panicMode: boolean;
@@ -26,7 +34,7 @@ interface FleetViewProps {
 
 export default function FleetView({ panicMode }: FleetViewProps) {
   const { t, language } = useLanguage();
-  const [selectedVehicle, setSelectedVehicle] = useState<any | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<FleetVehicle | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL");
 

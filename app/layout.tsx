@@ -6,6 +6,7 @@ import { LanguageProvider } from "./components/LanguageContext";
 import { RbacProvider } from "./components/RbacContext";
 import { AuthProvider } from "./components/AuthContext";
 import { ThemeProvider } from "./components/ThemeContext";
+import { QueryProvider } from "./providers/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +45,9 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <RbacProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <QueryProvider>{children}</QueryProvider>
+              </AuthProvider>
             </RbacProvider>
           </LanguageProvider>
         </ThemeProvider>

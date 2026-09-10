@@ -3,18 +3,21 @@ import { Clock, CheckCircle, Calendar, Archive } from "lucide-react";
 import { TemporalStatus } from "../model/types";
 
 interface ThresholdTimelineBadgeProps {
+  status?: TemporalStatus;
   temporalStatus?: TemporalStatus;
-  startTime: string | null;
-  endTime: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   effectiveDate?: string;
 }
 
 export const ThresholdTimelineBadge: React.FC<ThresholdTimelineBadgeProps> = ({
-  temporalStatus = "CURRENT",
+  status,
+  temporalStatus: propTemporalStatus,
   startTime,
   endTime,
   effectiveDate,
 }) => {
+  const temporalStatus = propTemporalStatus || status || "CURRENT";
   if (temporalStatus === "HISTORICAL") {
     return (
       <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400 font-mono bg-zinc-900 border border-zinc-700 px-1.5 py-0.5 rounded">

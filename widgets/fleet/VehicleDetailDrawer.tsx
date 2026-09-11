@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Cpu,
   Sliders,
@@ -7,7 +7,9 @@ import {
   MapPin,
   Activity,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  KeyRound,
+  CheckCircle2
 } from "lucide-react";
 import { FleetVehicle } from "@/entities/fleet/model/types";
 import { getTypeLabel } from "@/entities/fleet/model/mock-data";
@@ -19,6 +21,7 @@ interface VehicleDetailDrawerProps {
   onOpenSpeedModal: (v: FleetVehicle) => void;
   onLocationChange: (id: string, location: string) => void;
   onDecommission: (id: string) => void;
+  onRenewCertificate?: (vehicleId: string) => void;
 }
 
 export function VehicleDetailDrawer({
@@ -26,11 +29,27 @@ export function VehicleDetailDrawer({
   onClose,
   onOpenSpeedModal,
   onLocationChange,
-  onDecommission
+  onDecommission,
+  onRenewCertificate
 }: VehicleDetailDrawerProps) {
   const { t, language } = useLanguage();
+  const [isRenewingCert, setIsRenewingCert] = useState(false);
+  const [certSuccessMsg, setCertSuccessMsg] = useState<string | null>(null);
 
   if (!vehicle) return null;
+
+  const handleRenewCert = async () => {
+    setIsRenewingCert(true);
+    setCertSuccessMsg(null);
+    // Имитация сетевого запроса на бэкенд для выпуска нового X.509 сертификата (+1 год)
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    setIsRenewingCert(false);
+    setCertSuccessMsg(t("fleet.cert_success"));
+    if (onRenewCertificate) {
+      onRenewCertificate(vehicle.id);
+    }
+    setTimeout(() => setCertSuccessMsg(null), 4500);
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end font-sans">
@@ -241,6 +260,52 @@ export function VehicleDetailDrawer({
               {language === "ko" ? "현재 펌웨어 버전" : "Firmware Version"}
             </span>
             <span className="font-mono font-bold text-[var(--foreground)]">{vehicle.ota}</span>
+          </div>
+
+          {/* mTLS Device Certificate & Rotation Card */}
+          <div className="bg-[var(--panel-header-bg)] border border-panel-border rounded-lg p-3.5 space-y-2.5">
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-bold text-[var(--foreground)] flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-brand-emerald" />
+                <span>{t("fleet.cert_title")}</span>
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold border text-brand-emerald bg-brand-emerald/10 border-brand-emerald/30">
+                {t("fleet.cert_valid")}
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-[10px] font-mono text-[var(--muted-text)] bg-[var(--panel-bg)] p-2.5 rounded border border-panel-border">
+              <div className="flex justify-between">
+                <span>Fingerprint:</span>
+                <span className="text-[var(--foreground)] font-bold">SHA256: 8d3e...7a02</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Issuer:</span>
+                <span className="text-[var(--foreground)]">CoreGuard-Root-CA</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Valid:</span>
+                <span className="text-brand-emerald">2027-09-11 (365d)</span>
+              </div>
+            </div>
+
+            {certSuccessMsg && (
+              <div className="flex items-center gap-1.5 p-2 bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald text-[11px] rounded animate-fade-in font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span>{certSuccessMsg}</span>
+              </div>
+            )}
+
+            <button
+              onClick={handleRenewCert}
+              disabled={isRenewingCert}
+              className="w-full px-3 py-2 rounded bg-brand-cyan/10 border border-brand-cyan/30 text-brand-cyan hover:bg-brand-cyan hover:text-white dark:hover:text-black text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <KeyRound className={`w-3.5 h-3.5 ${isRenewingCert ? "animate-spin" : ""}`} />
+              <span>
+                {isRenewingCert ? t("fleet.cert_renewing") : t("fleet.cert_renew")}
+              </span>
+            </button>
           </div>
         </div>
 

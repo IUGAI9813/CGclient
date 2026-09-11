@@ -135,6 +135,11 @@ const translations: Record<Language, Record<string, string>> = {
     "fleet.firmware": "Firmware Version",
     "fleet.last_reported": "Last Reported Location",
     "fleet.speed_limit": "Active Speed Limit Override",
+    "fleet.cert_title": "mTLS X.509 Device Certificate",
+    "fleet.cert_renew": "Renew Certificate (+1 Year)",
+    "fleet.cert_renewing": "Rotating & Signing Certificate...",
+    "fleet.cert_valid": "VALID",
+    "fleet.cert_success": "mTLS Certificate renewed and extended for 1 year (HSM Synced).",
     
     // AuditView
     "audit.search": "Search audit trail by operator, action code, or ID...",
@@ -333,6 +338,11 @@ const translations: Record<Language, Record<string, string>> = {
     "fleet.firmware": "펌웨어 버전",
     "fleet.last_reported": "마지막 보고된 위치",
     "fleet.speed_limit": "활성 속도 제어 오버라이드",
+    "fleet.cert_title": "mTLS X.509 기기 보안 인증서",
+    "fleet.cert_renew": "mTLS 인증서 갱신 (+1년)",
+    "fleet.cert_renewing": "인증서 재발급 및 서명 중...",
+    "fleet.cert_valid": "유효 (VALID)",
+    "fleet.cert_success": "차량 mTLS X.509 인증서가 성공적으로 갱신되었습니다 (1년 연장, HSM 동기화 완료).",
     
     // AuditView
     "audit.search": "운영자, 조치 코드 또는 ID로 감사 추적 검색...",

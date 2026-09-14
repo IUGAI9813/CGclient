@@ -26,9 +26,9 @@ export function JwtInspectorWidget() {
       return { header, payload, isValid: true };
     } catch {
       return {
-        header: { alg: "RS256", typ: "JWT", kid: "42dot-kms-soc-auth-2026" },
+        header: { alg: "RS256", typ: "JWT", kid: "cg-kms-soc-auth-2026" },
         payload: {
-          iss: "https://auth.42dot.ai/oauth/v2",
+          iss: "https://auth.coreguard.io/oauth/v2",
           sub: "operator_alex_s",
           roles: ["SOC_ADMIN", "DISPATCHER"],
           scopes: ["read:fleet", "write:fleet", "write:emergency_stop", "ota:dispatch"]
@@ -116,7 +116,7 @@ export function JwtInspectorWidget() {
           </div>
 
           <div className="text-[10px] text-zinc-500 leading-relaxed font-mono">
-            Tokens are cryptographically stamped with 42dot Hardware Security Module (HSM) keys using
+            Tokens are cryptographically stamped with CoreGuard Hardware Security Module (HSM) keys using
             RS256 with 90-minute rotation schedules.
           </div>
         </div>

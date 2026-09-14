@@ -78,7 +78,7 @@ export default function SettingsView() {
         "연결된 전체 구역 차량에 광역 비상 정지를 브로드캐스팅하기 전에 2차 확인 모달 및 감사 기록 생성을 강제합니다.",
       enabled: true,
       severity: "HIGH",
-      protocol: "42dot Fail-Safe v3.1",
+      protocol: "ISO-26262 Fail-Safe v3.1",
     },
     {
       id: "mrm_pullover_enforce",

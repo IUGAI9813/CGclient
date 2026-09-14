@@ -24,6 +24,7 @@ import { useRbac, RbacRole, allNavTabIds } from "./RbacContext";
 import { useAuth } from "./AuthContext";
 import { useTheme } from "./ThemeContext";
 import AuthModal from "./views/AuthModal";
+import UserProfileModal from "./views/UserProfileModal";
 
 interface ConsoleLayoutProps {
   activeTab: string;
@@ -51,6 +52,7 @@ export default function ConsoleLayout({
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
   const [utcTime, setUtcTime] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("Seoul - Gangnam SOC");
@@ -119,7 +121,7 @@ export default function ConsoleLayout({
                     <h1 className="text-sm font-bold tracking-wider text-white">COREGUARD</h1>
                   </div>
                   <span className="text-[10px] text-zinc-500 font-mono tracking-widest block mt-0.5">
-                    {t("layout.subtitle")}
+                    {/* {t("layout.subtitle")} */}
                   </span>
                 </div>
               ) : (
@@ -181,34 +183,27 @@ export default function ConsoleLayout({
             {!sidebarCollapsed ? (
               <div className="p-3 border-b border-panel-border flex items-center justify-between gap-2 font-mono">
                 <div 
-                  className="w-8 h-8 rounded-full bg-[var(--panel-header-bg)] border border-panel-border flex items-center justify-center text-xs font-bold text-brand-cyan shadow-inner shrink-0 cursor-pointer hover:border-brand-cyan"
-                  onClick={() => setShowAuthModal(true)}
-                  title="Switch Account / Sign In"
+                  className="w-8 h-8 rounded-full bg-[var(--panel-header-bg)] border border-panel-border flex items-center justify-center text-xs font-bold text-brand-cyan shadow-inner shrink-0 cursor-pointer hover:border-brand-cyan transition-colors"
+                  onClick={() => setShowUserModal(true)}
+                  title="Open Operator Profile"
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
-                <div className="flex flex-col flex-1 min-w-0">
+                <div 
+                  className="flex flex-col flex-1 min-w-0 cursor-pointer hover:opacity-85 transition-opacity"
+                  onClick={() => setShowUserModal(true)}
+                  title="Open Operator Profile"
+                >
                   <span className="text-xs font-bold text-[var(--foreground)] truncate" title={currentUser?.email}>
                     {currentUser?.name || "Alex S."}
                   </span>
-                  <select
-                    value={currentRole}
-                    onChange={(e) => setCurrentRole(e.target.value as RbacRole)}
-                    className="bg-[var(--input-bg)] border border-panel-border rounded text-[9px] text-brand-cyan font-bold uppercase tracking-wider py-0.5 px-1 mt-0.5 outline-none cursor-pointer focus:border-brand-cyan"
-                    title="Switch Active Operator Role to test RBAC restrictions"
-                  >
-                    <option value="admin">SOC Admin</option>
-                    <option value="dispatcher">Lead Dispatcher</option>
-                    <option value="analyst">Security Analyst</option>
-                    <option value="technician">Hangar Tech</option>
-                  </select>
+                  <span className="text-[9px] text-brand-cyan font-bold uppercase tracking-wider mt-0.5">
+                    {currentRole === "admin" ? "SOC Admin" : currentRole === "dispatcher" ? "Lead Dispatcher" : currentRole === "analyst" ? "Security Analyst" : "Hangar Tech"}
+                  </span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    logout();
-                    setShowAuthModal(true);
-                  }}
+                  onClick={logout}
                   title={language === "ko" ? "로그아웃" : "Sign Out"}
                   className="p-1.5 text-zinc-500 hover:text-brand-rose hover:bg-brand-rose/10 rounded border border-transparent hover:border-brand-rose/30 transition-all cursor-pointer"
                 >
@@ -218,9 +213,9 @@ export default function ConsoleLayout({
             ) : (
               <div className="p-2 border-b border-panel-border flex justify-center">
                 <div 
-                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer hover:border-brand-cyan transition-colors"
                   title={`Active Role: ${currentRole.toUpperCase()}`}
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={() => setShowUserModal(true)}
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
@@ -399,12 +394,22 @@ export default function ConsoleLayout({
         </div>
       </div>
 
-      {/* Authentication Gateway Modal */}
-      <AuthModal
-        isOpen={!isAuthenticated || showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        canClose={isAuthenticated}
-      />
+      {/* User Profile & Session Modal */}
+      {showUserModal && (
+        <UserProfileModal
+          isOpen={showUserModal}
+          onClose={() => setShowUserModal(false)}
+        />
+      )}
+
+      {/* Optional Account Switch Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          canClose={true}
+        />
+      )}
     </div>
   );
 }

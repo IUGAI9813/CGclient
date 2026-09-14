@@ -12,7 +12,7 @@ export function ClientAppsWidget({ clients, onRegisterClientClick }: ClientAppsW
     if (onRegisterClientClick) {
       onRegisterClientClick();
     } else {
-      alert("New OAuth client creation modal: Redirects to 42dot Developer Identity Portal.");
+      alert("New OAuth client creation modal: Redirects to CoreGuard Developer Identity Portal.");
     }
   };
 

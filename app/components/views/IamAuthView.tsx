@@ -69,9 +69,10 @@ export default function IamAuthView() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in font-mono">
-      {/* Top IAM Overview KPI Metric Cards */}
+    <div className="space-y-4 animate-fade-in font-sans">
+      {/* Top IAM Minimal Header */}
       <IamKpiGrid users={users} pendingApprovals={pendingApprovals} />
+
 
       {/* Sub-tab Navigation */}
       <IamSubNav

@@ -13,23 +13,23 @@ export function PolicyActionBadge({ action }: PolicyActionBadgeProps) {
     switch (action) {
       case "ACT_FORCE_STOP":
         return {
-          label: language === "ko" ? "비상 정지" : "FORCE STOP",
-          classes: "border-brand-rose/30 text-brand-rose bg-brand-rose/10"
+          label: language === "ko" ? "비상 정지" : "Stop",
+          classes: "border-brand-rose/30 text-brand-rose bg-brand-rose/5"
         };
       case "ACT_LIMIT_SPEED":
         return {
-          label: language === "ko" ? "속도 제한" : "LIMIT SPEED",
-          classes: "border-brand-amber/30 text-brand-amber bg-brand-amber/10"
+          label: language === "ko" ? "속도 제한" : "Speed Limit",
+          classes: "border-brand-amber/30 text-brand-amber bg-brand-amber/5"
         };
       case "ACT_WARN_DRIVER":
         return {
-          label: language === "ko" ? "운전자 경고" : "WARN DRIVER",
-          classes: "border-brand-cyan/30 text-brand-cyan bg-brand-cyan/10"
+          label: language === "ko" ? "경고 발령" : "Warning",
+          classes: "border-brand-cyan/30 text-brand-cyan bg-brand-cyan/5"
         };
       default:
         return {
-          label: language === "ko" ? "인시던트 등록" : "RAISE INCIDENT",
-          classes: "border-zinc-500/30 text-zinc-400 bg-zinc-500/10"
+          label: language === "ko" ? "인시던트 등록" : "Incident",
+          classes: "border-panel-border text-[var(--muted-text)] bg-[var(--panel-header-bg)]"
         };
     }
   };
@@ -37,8 +37,9 @@ export function PolicyActionBadge({ action }: PolicyActionBadgeProps) {
   const badge = getBadgeStyle();
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${badge.classes}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${badge.classes}`}>
       {badge.label}
     </span>
   );
 }
+

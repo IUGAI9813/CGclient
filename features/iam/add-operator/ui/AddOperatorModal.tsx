@@ -77,7 +77,7 @@ export function AddOperatorModal({ isOpen, onClose, onAddUser }: AddOperatorModa
               required
               value={newUserEmail}
               onChange={(e) => setNewUserEmail(e.target.value)}
-              placeholder="sujin.kim@42dot.ai"
+              placeholder="sujin.kim@coreguard.io"
               className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-white outline-none focus:border-brand-cyan"
             />
           </div>

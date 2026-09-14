@@ -1,8 +1,13 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
+import { Play } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
 import { RouteDefinition, RouteCategory } from "@/entities/gateway/model/types";
-import { RouteCard } from "@/entities/gateway/ui/RouteCard";
+import { MethodBadge } from "@/entities/gateway/ui/MethodBadge";
+import { StatusBadge } from "@/entities/gateway/ui/StatusBadge";
 import { RouteFilterBar } from "@/features/gateway/filter-routes/ui/RouteFilterBar";
-import { EndpointInspector } from "@/features/gateway/inspect-route/ui/EndpointInspector";
+import { DataTable } from "@/shared/ui/data-table/DataTable";
 
 interface RouteRegistryWidgetProps {
   routes: RouteDefinition[];
@@ -30,38 +35,118 @@ export const RouteRegistryWidget: React.FC<RouteRegistryWidgetProps> = ({
     });
   }, [routes, searchQuery, selectedCategory]);
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Route List (2 Columns) */}
-      <div className="lg:col-span-2 space-y-4">
-        <RouteFilterBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
-
-        <div className="space-y-2">
-          {filteredRoutes.map((route) => (
-            <RouteCard
-              key={route.id}
-              route={route}
-              isSelected={selectedRoute?.id === route.id}
-              onSelect={onSelectRoute}
-            />
-          ))}
-          {filteredRoutes.length === 0 && (
-            <div className="cyber-panel p-8 rounded text-center text-zinc-500 text-xs">
-              No matching endpoints found for &ldquo;{searchQuery}&rdquo;.
+  const columns = useMemo<ColumnDef<RouteDefinition>[]>(
+    () => [
+      {
+        accessorKey: "method",
+        header: "Method",
+        size: 80,
+        cell: ({ row }) => <MethodBadge method={row.original.method} />,
+      },
+      {
+        accessorKey: "path",
+        header: "Route Path",
+        cell: ({ row }) => {
+          const route = row.original;
+          return (
+            <div>
+              <span className="font-semibold text-xs text-[var(--foreground)] font-mono block">
+                {route.path}
+              </span>
+              <span className="text-[11px] text-[var(--muted-text)] font-mono">
+                {route.upstream}
+              </span>
             </div>
-          )}
-        </div>
-      </div>
+          );
+        },
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        size: 110,
+        cell: ({ row }) => (
+          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[var(--panel-header-bg)] border border-panel-border text-[var(--foreground)]">
+            {row.original.category}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "rateLimit",
+        header: "Rate Limit",
+        size: 100,
+        cell: ({ row }) => (
+          <span className="text-xs font-mono text-[var(--foreground)]">
+            {row.original.rateLimit.toLocaleString()}{" "}
+            <span className="text-[10px] text-[var(--muted-text)]">RPM</span>
+          </span>
+        ),
+      },
+      {
+        accessorKey: "authType",
+        header: "Auth",
+        size: 110,
+        cell: ({ row }) => (
+          <span className="text-xs text-[var(--muted-text)] font-mono">
+            {row.original.authType}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "status",
+        header: () => <div className="text-center">Status</div>,
+        size: 90,
+        cell: ({ row }) => (
+          <div className="flex justify-center">
+            <StatusBadge status={row.original.status} />
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        header: () => null,
+        size: 70,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const route = row.original;
+          return (
+            <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => onOpenTester(route)}
+                className="px-2.5 py-1 bg-[var(--panel-header-bg)] hover:bg-brand-cyan/15 hover:text-brand-cyan border border-panel-border text-xs font-medium rounded transition-colors flex items-center gap-1 cursor-pointer text-[var(--muted-text)]"
+                title="Test in sandbox"
+              >
+                <Play className="w-3 h-3 text-brand-cyan" />
+                <span>Test</span>
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [onOpenTester]
+  );
 
-      {/* Route Details Panel (1 Column) */}
-      <div className="lg:col-span-1">
-        <EndpointInspector route={selectedRoute} onOpenTester={onOpenTester} />
+  return (
+    <div className="space-y-3 font-sans">
+      <RouteFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
+
+      <div className="cyber-panel rounded-lg overflow-hidden border border-panel-border">
+        <DataTable
+          data={filteredRoutes}
+          columns={columns}
+          selectedRowId={selectedRoute?.id}
+          getRowId={(r) => r.id}
+          onRowClick={onSelectRoute}
+          enableSorting={true}
+          emptyMessage="No matching endpoints found."
+        />
       </div>
     </div>
   );
 };
+

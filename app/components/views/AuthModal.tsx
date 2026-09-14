@@ -4,14 +4,11 @@ import React, { useState } from "react";
 import { 
   ShieldCheck, 
   Lock, 
-  KeyRound, 
   UserCheck, 
   AlertCircle, 
   CheckCircle2, 
   RefreshCw, 
-  UserPlus, 
-  ChevronRight,
-  Fingerprint
+  X
 } from "lucide-react";
 import { useAuth } from "../AuthContext";
 import { RbacRole } from "../RbacContext";
@@ -30,7 +27,7 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
   const [mode, setMode] = useState<"login" | "register">("login");
   
   // Login form state
-  const [loginEmail, setLoginEmail] = useState("admin@42dot.ai");
+  const [loginEmail, setLoginEmail] = useState("admin@coreguard.io");
   const [loginPassword, setLoginPassword] = useState("••••••••");
   const [loginRoleOverride, setLoginRoleOverride] = useState<RbacRole>("admin");
   const [isLoading, setIsLoading] = useState(false);
@@ -92,150 +89,134 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in font-mono">
-      <div className="relative w-full max-w-xl bg-zinc-950 border border-panel-border rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col">
-        {/* Top Decorative Cyberpunk Scanline / Header */}
-        <div className="h-1 bg-gradient-to-r from-brand-cyan via-brand-emerald to-brand-cyan w-full" />
-
-        <div className="p-6 border-b border-panel-border bg-zinc-900/30 flex items-start justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-brand-cyan animate-ping" />
-              <span className="text-[10px] text-brand-cyan font-bold tracking-widest uppercase">
-                42dot CoreGuard SOC // AUTHENTICATION GATEWAY
-              </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in font-sans">
+      <div className="relative w-full max-w-md bg-[var(--panel-bg)] border border-panel-border rounded-xl shadow-2xl overflow-hidden flex flex-col">
+        {/* Modal Header */}
+        <div className="p-5 border-b border-panel-border bg-[var(--panel-header-bg)] flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-brand-cyan" />
-              <span>{language === "ko" ? "보안 관제 센터 통합 인증" : "SOC Security Gateway"}</span>
-            </h1>
-            <p className="text-xs text-zinc-400">
-              {language === "ko"
-                ? "자율주행 차량 관제 콘솔 접근을 위해 운영자 자격을 증명하거나 가입을 신청하십시오."
-                : "Authenticate operator credentials or request clearance for autonomous vehicle fleet management."}
-            </p>
+            <div>
+              <h1 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+                {language === "ko" ? "CoreGuard 보안 관제 센터" : "CoreGuard SOC Console"}
+              </h1>
+              <p className="text-xs text-[var(--muted-text)] mt-0.5">
+                {language === "ko" ? "운영자 인증 및 권한 관리" : "Operator Authentication & Clearance"}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col items-end">
-            <span className="text-[9px] px-2 py-0.5 rounded font-bold border border-brand-emerald/30 bg-brand-emerald/10 text-brand-emerald flex items-center gap-1">
-              <Fingerprint className="w-3 h-3" />
-              <span>KMS ENCRYPTED</span>
-            </span>
-            <span className="text-[9px] text-zinc-500 mt-1">v2.4.1 (HSM Level 3)</span>
-          </div>
+          {canClose && onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-md text-[var(--muted-text)] hover:text-[var(--foreground)] hover:bg-[var(--panel-bg)] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Tab Switcher */}
-        <div className="grid grid-cols-2 border-b border-panel-border bg-zinc-900/40 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => {
-              setMode("login");
-              setErrorMessage(null);
-              setRegSuccess(false);
-            }}
-            className={`py-3 flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              mode === "login"
-                ? "bg-zinc-950 text-brand-cyan border-b-2 border-brand-cyan"
-                : "text-zinc-500 hover:text-zinc-300"
-            }`}
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>{language === "ko" ? "운영자 로그인" : "Operator Sign In"}</span>
-          </button>
+        <div className="px-5 pt-3 bg-[var(--panel-header-bg)] border-b border-panel-border">
+          <div className="flex items-center gap-1 bg-[var(--input-bg)] p-1 rounded-lg border border-panel-border">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setErrorMessage(null);
+                setRegSuccess(false);
+              }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                mode === "login"
+                  ? "bg-[var(--panel-bg)] text-brand-cyan shadow-2xs"
+                  : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
+              }`}
+            >
+              {language === "ko" ? "운영자 로그인" : "Sign In"}
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setMode("register");
-              setErrorMessage(null);
-            }}
-            className={`py-3 flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              mode === "register"
-                ? "bg-zinc-950 text-brand-cyan border-b-2 border-brand-cyan"
-                : "text-zinc-500 hover:text-zinc-300"
-            }`}
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>{language === "ko" ? "접근 권한 등록 신청" : "Request Access Clearance"}</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("register");
+                setErrorMessage(null);
+              }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                mode === "register"
+                  ? "bg-[var(--panel-bg)] text-brand-cyan shadow-2xs"
+                  : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
+              }`}
+            >
+              {language === "ko" ? "가입 신청" : "Request Access"}
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+        <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
           {errorMessage && (
-            <div className="p-3 bg-brand-rose/10 border border-brand-rose/30 rounded text-xs text-brand-rose flex items-start gap-2 animate-fade-in">
+            <div className="p-3 bg-brand-rose/10 border border-brand-rose/20 rounded-md text-xs text-brand-rose flex items-start gap-2 animate-fade-in">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <span className="font-bold block uppercase text-[10px]">AUTH_SECURITY_DENIED</span>
-                <span>{errorMessage}</span>
-              </div>
+              <span>{errorMessage}</span>
             </div>
           )}
 
           {/* MODE: LOGIN */}
           {mode === "login" && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-
+            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               {/* Email */}
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  {language === "ko" ? "운영자 사내 이메일" : "OPERATOR CORPORATE EMAIL"}
+                <label className="text-xs font-medium text-[var(--foreground)]">
+                  {language === "ko" ? "사내 이메일" : "Email Address"}
                 </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="operator@42dot.ai"
-                    className="w-full bg-zinc-900 border border-panel-border rounded p-2.5 text-xs text-white outline-none focus:border-brand-cyan transition-colors"
-                  />
-                </div>
+                <input
+                  type="email"
+                  required
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="operator@coreguard.io"
+                  className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] outline-none focus:border-brand-cyan transition-colors"
+                />
               </div>
 
               {/* Password */}
               <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                    {language === "ko" ? "비밀번호 / HSM 챌린지 핀" : "PASSWORD / HSM PIN"}
-                  </label>
-                  <span className="text-[9px] text-zinc-600">SHA-256 / BCrypt</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-zinc-900 border border-panel-border rounded p-2.5 text-xs text-white outline-none focus:border-brand-cyan transition-colors font-mono"
-                  />
-                </div>
+                <label className="text-xs font-medium text-[var(--foreground)]">
+                  {language === "ko" ? "비밀번호" : "Password"}
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] outline-none focus:border-brand-cyan transition-colors font-mono"
+                />
               </div>
 
-              {/* Role Override Selector */}
+              {/* Role Selection */}
               <div className="space-y-1">
-                <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                  {language === "ko" ? "세션 역할 지정 (RBAC Clearance)" : "SESSION RBAC ROLE"}
+                <label className="text-xs font-medium text-[var(--foreground)]">
+                  {language === "ko" ? "역할 (RBAC Role)" : "Role"}
                 </label>
                 <select
                   value={loginRoleOverride}
                   onChange={(e) => setLoginRoleOverride(e.target.value as RbacRole)}
-                  className="w-full bg-zinc-900 border border-panel-border rounded p-2.5 text-xs text-brand-cyan font-bold outline-none focus:border-brand-cyan cursor-pointer"
+                  className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] font-medium outline-none focus:border-brand-cyan cursor-pointer"
                 >
-                  <option value="admin">SOC Administrator (전체 권한 / Full Security & RBAC)</option>
-                  <option value="dispatcher">SOC Lead Dispatcher (플릿 관제 & E-Stop / Fleet Control)</option>
-                  <option value="analyst">Security Analyst (CAN 분석 & 이상 탐지 / Threat Analysis)</option>
-                  <option value="technician">Hangar Depot Tech (차량 센서 & OTA 보수 / Diagnostics)</option>
+                  <option value="admin">Administrator (전체 관리자)</option>
+                  <option value="dispatcher">Lead Dispatcher (플릿 관제/비상정지)</option>
+                  <option value="analyst">Security Analyst (보안/이상탐지 분석)</option>
+                  <option value="technician">Technician (차량 센서/정비)</option>
                 </select>
               </div>
 
-              {/* Submit */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3 bg-brand-cyan hover:bg-brand-cyan/90 text-black font-bold text-xs rounded transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.3)] cursor-pointer disabled:opacity-50"
+                className="w-full mt-2 py-2.5 bg-brand-cyan hover:opacity-90 text-white dark:text-black font-semibold text-xs rounded-md transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isLoading ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -244,8 +225,8 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
                 )}
                 <span>
                   {isLoading
-                    ? (language === "ko" ? "인증 토큰 서명 중..." : "Validating Token via KMS...")
-                    : (language === "ko" ? "관제 콘솔 로그인" : "Authenticate & Access Console")}
+                    ? (language === "ko" ? "인증 중..." : "Authenticating...")
+                    : (language === "ko" ? "로그인" : "Sign In")}
                 </span>
               </button>
             </form>
@@ -255,30 +236,19 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
           {mode === "register" && (
             <div>
               {regSuccess ? (
-                <div className="space-y-4 py-4 text-center animate-fade-in">
-                  <div className="w-12 h-12 rounded-full bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-6 h-6" />
+                <div className="space-y-3 py-2 text-center animate-fade-in">
+                  <div className="w-10 h-10 rounded-full bg-brand-emerald/10 border border-brand-emerald/20 text-brand-emerald flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-white">
-                      {language === "ko" ? "가입 승인 신청이 접수되었습니다" : "Clearance Request Submitted Successfully"}
+                    <h3 className="text-sm font-bold text-[var(--foreground)]">
+                      {language === "ko" ? "가입 신청이 완료되었습니다" : "Request Submitted"}
                     </h3>
-                    <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
+                    <p className="text-xs text-[var(--muted-text)] leading-relaxed">
                       {language === "ko"
-                        ? "보안 규정에 따라 SOC 관리자가 귀하의 사원 정보 및 역할을 검토한 후 승인(Approve)을 완료하면 콘솔에 로그인할 수 있습니다."
-                        : "According to ISO/SAE 21434 protocols, a SOC Administrator will review your department and requested role before granting login access."}
+                        ? "SOC 관리자의 승인(Approve) 후 콘솔에 로그인할 수 있습니다."
+                        : "A SOC Administrator will review your clearance request before access is granted."}
                     </p>
-                  </div>
-
-                  <div className="p-3 bg-zinc-900/60 border border-panel-border rounded text-[11px] text-zinc-400 font-mono text-left max-w-md mx-auto">
-                    <div className="flex justify-between py-0.5">
-                      <span className="text-zinc-500">REQUEST_STATUS:</span>
-                      <span className="text-amber-400 font-bold">PENDING_ADMIN_SIGNOFF</span>
-                    </div>
-                    <div className="flex justify-between py-0.5">
-                      <span className="text-zinc-500">APPLICANT:</span>
-                      <span className="text-white">{regName || "New Operator"}</span>
-                    </div>
                   </div>
 
                   <button
@@ -287,97 +257,90 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
                       setMode("login");
                       setRegSuccess(false);
                     }}
-                    className="px-4 py-2 bg-zinc-900 border border-panel-border hover:border-zinc-700 text-white rounded text-xs font-bold transition-all cursor-pointer"
+                    className="px-4 py-2 bg-[var(--panel-header-bg)] border border-panel-border text-[var(--foreground)] rounded-md text-xs font-semibold hover:bg-[var(--panel-bg)] transition-colors cursor-pointer"
                   >
-                    {language === "ko" ? "로그인 화면으로 이동" : "Return to Sign In"}
+                    {language === "ko" ? "로그인으로 돌아가기" : "Return to Sign In"}
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Full Name */}
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                        {language === "ko" ? "운영자 성명" : "FULL NAME"} *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={regName}
-                        onChange={(e) => setRegName(e.target.value)}
-                        placeholder="e.g. Hye-Jin Lee"
-                        className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-white outline-none focus:border-brand-cyan"
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div className="space-y-1">
-                      <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                        {language === "ko" ? "사내 이메일" : "CORPORATE EMAIL"} *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={regEmail}
-                        onChange={(e) => setRegEmail(e.target.value)}
-                        placeholder="operator@42dot.ai"
-                        className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-white outline-none focus:border-brand-cyan"
-                      />
-                    </div>
+                <form onSubmit={handleRegisterSubmit} className="space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-[var(--foreground)]">
+                      {language === "ko" ? "성명" : "Full Name"} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      placeholder="e.g. Hye-Jin Lee"
+                      className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] outline-none focus:border-brand-cyan"
+                    />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Department */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-[var(--foreground)]">
+                      {language === "ko" ? "사내 이메일" : "Email Address"} *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                      placeholder="operator@coreguard.io"
+                      className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] outline-none focus:border-brand-cyan"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
                     <div className="space-y-1">
-                      <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                        {language === "ko" ? "소속 부서" : "DEPARTMENT / ORG"}
+                      <label className="text-xs font-medium text-[var(--foreground)]">
+                        {language === "ko" ? "부서" : "Department"}
                       </label>
                       <input
                         type="text"
                         value={regDept}
                         onChange={(e) => setRegDept(e.target.value)}
-                        placeholder="e.g. Gangnam Operations Division"
-                        className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-white outline-none focus:border-brand-cyan"
+                        placeholder="Fleet Division"
+                        className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] outline-none focus:border-brand-cyan"
                       />
                     </div>
 
-                    {/* Desired Role */}
                     <div className="space-y-1">
-                      <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                        {language === "ko" ? "신청 권한 등급 (Role)" : "REQUESTED RBAC ROLE"}
+                      <label className="text-xs font-medium text-[var(--foreground)]">
+                        {language === "ko" ? "희망 역할" : "Role"}
                       </label>
                       <select
                         value={regRole}
                         onChange={(e) => setRegRole(e.target.value as RbacRole)}
-                        className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-brand-cyan font-bold outline-none focus:border-brand-cyan cursor-pointer"
+                        className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] font-medium outline-none focus:border-brand-cyan cursor-pointer"
                       >
-                        <option value="dispatcher">Lead Dispatcher (관제 및 지령 운용)</option>
-                        <option value="analyst">Security Analyst (위협 분석 및 로그 분석)</option>
-                        <option value="technician">Hangar Tech (센서 하드웨어 및 정비)</option>
-                        <option value="admin">SOC Administrator (전체 관리자)</option>
+                        <option value="dispatcher">Dispatcher</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="technician">Technician</option>
+                        <option value="admin">Administrator</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* Access Reason / Justification */}
                   <div className="space-y-1">
-                    <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                      {language === "ko" ? "신청 사유 및 업무 목적" : "JUSTIFICATION FOR ACCESS"} *
+                    <label className="text-xs font-medium text-[var(--foreground)]">
+                      {language === "ko" ? "신청 사유" : "Reason / Purpose"} *
                     </label>
                     <textarea
                       required
                       rows={2}
                       value={regReason}
                       onChange={(e) => setRegReason(e.target.value)}
-                      placeholder={language === "ko" ? "예: 강남구 로보택시 야간 운행 모니터링 및 비상 대응 담당" : "Describe operational mission requirements..."}
-                      className="w-full bg-zinc-900 border border-panel-border rounded p-2 text-xs text-white outline-none focus:border-brand-cyan resize-none"
+                      placeholder={language === "ko" ? "업무 목적을 간략히 작성해 주십시오." : "Describe operational purpose..."}
+                      className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] outline-none focus:border-brand-cyan resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full mt-2 py-3 bg-brand-cyan hover:bg-brand-cyan/90 text-black font-bold text-xs rounded transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.3)] cursor-pointer disabled:opacity-50"
+                    className="w-full mt-2 py-2.5 bg-brand-cyan hover:opacity-90 text-white dark:text-black font-semibold text-xs rounded-md transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isLoading ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -385,7 +348,7 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
                       <UserCheck className="w-4 h-4" />
                     )}
                     <span>
-                      {language === "ko" ? "가입 승인 신청서 제출" : "Submit Clearance Application"}
+                      {language === "ko" ? "신청서 제출" : "Submit Request"}
                     </span>
                   </button>
                 </form>
@@ -393,22 +356,8 @@ export default function AuthModal({ isOpen, onClose, canClose = false }: AuthMod
             </div>
           )}
         </div>
-
-        {/* Footer info & Optional Close */}
-        <div className="p-4 border-t border-panel-border bg-zinc-900/20 flex justify-between items-center text-[10px] text-zinc-500">
-          <span>Protected by 42dot Zero-Trust Security Gateway</span>
-          {canClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-zinc-400 hover:text-white flex items-center gap-1 font-bold cursor-pointer"
-            >
-              <span>{language === "ko" ? "닫기" : "Close"}</span>
-              <ChevronRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
 }
+

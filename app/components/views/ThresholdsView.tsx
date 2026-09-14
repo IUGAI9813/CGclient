@@ -96,7 +96,7 @@ export default function ThresholdsView() {
       version: "v1.0",
       changeReason:
         language === "ko" ? "신규 안전 정책 파라미터 등록" : "Initial safety parameter registration",
-      updatedBy: "alex.s@42dot.ai",
+      updatedBy: "alex.s@coreguard.io",
       updatedAt: new Date().toISOString().replace("T", " ").substring(0, 19),
       batteryWarn: 25,
       batteryCrit: 15,
@@ -161,11 +161,10 @@ export default function ThresholdsView() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in font-mono">
-      {/* 1. Top Overview KPI Grid */}
-      <ThresholdOverviewWidget rules={rules} />
-
-      {/* 2. Dual-Axis Precedence Toolbar */}
+    <div className="space-y-4 animate-fade-in font-sans">
+      {/* 1. Top Overview Minimal Header */}
+   
+      {/* 2. Compact Filter Toolbar */}
       <ThresholdFilterToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -182,11 +181,12 @@ export default function ThresholdsView() {
 
       {/* Notification Toast */}
       {deployedNotification && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-400 text-xs flex items-center gap-2 animate-fade-in">
+        <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md text-emerald-400 text-xs flex items-center gap-2 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{deployedNotification}</span>
         </div>
       )}
+
 
       {/* 3. Master Rules Table */}
       <ThresholdRuleTableWidget

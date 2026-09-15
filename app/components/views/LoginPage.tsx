@@ -9,16 +9,13 @@ import {
   CheckCircle2, 
   RefreshCw, 
   Sun, 
-  Moon, 
-  Globe,
-  Radio,
-  KeyRound,
-  ShieldAlert
+  Moon
 } from "lucide-react";
 import { useAuth } from "../AuthContext";
-import { RbacRole, useRbac } from "../RbacContext";
+import { RbacRole } from "../RbacContext";
 import { useLanguage } from "../LanguageContext";
 import { useTheme } from "../ThemeContext";
+import { DynamicForm, FormFieldConfig } from "@/shared/ui/form";
 
 export default function LoginPage() {
   const { login, requestAccess } = useAuth();
@@ -28,26 +25,101 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
   
   // Login form state
-  const [loginEmail, setLoginEmail] = useState("admin@gmail.com");
-  const [loginPassword, setLoginPassword] = useState("••••••••");
-  const [loginRoleOverride, setLoginRoleOverride] = useState<RbacRole>("admin");
+  const [loginForm, setLoginForm] = useState({
+    email: "admin@gmail.com",
+    password: "••••••••",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Registration form state
-  const [regName, setRegName] = useState("");
-  const [regEmail, setRegEmail] = useState("");
-  const [regDept, setRegDept] = useState("Autonomous Mobility Fleet Division");
-  const [regRole, setRegRole] = useState<RbacRole>("dispatcher");
-  const [regReason, setRegReason] = useState("");
+  const [regForm, setRegForm] = useState({
+    name: "",
+    email: "",
+    department: "Autonomous Mobility Fleet Division",
+    role: "dispatcher" as RbacRole,
+    reason: "",
+  });
   const [regSuccess, setRegSuccess] = useState(false);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  // Dynamic Form Field Configs for Login
+  const loginFields: FormFieldConfig[] = [
+    {
+      name: "email",
+      type: "email",
+      label: language === "ko" ? "사내 이메일" : "Email Address",
+      placeholder: "operator@coreguard.io",
+      required: true,
+    },
+    {
+      name: "password",
+      type: "password",
+      label: language === "ko" ? "비밀번호" : "Password",
+      placeholder: "••••••••",
+      required: true,
+    },
+  ];
+
+  // Dynamic Form Field Configs for Registration / Request Access
+  const registerFields: FormFieldConfig[] = [
+    {
+      name: "name",
+      type: "text",
+      label: language === "ko" ? "성명" : "Full Name",
+      placeholder: "e.g. Hye-Jin Lee",
+      required: true,
+    },
+    {
+      name: "email",
+      type: "email",
+      label: language === "ko" ? "사내 이메일" : "Email Address",
+      placeholder: "operator@coreguard.io",
+      required: true,
+    },
+    {
+      name: "department",
+      type: "text",
+      label: language === "ko" ? "부서" : "Department",
+      placeholder: "Fleet Division",
+    },
+    {
+      name: "role",
+      type: "select",
+      label: language === "ko" ? "희망 역할" : "Role",
+      options: [
+        { label: "Dispatcher", value: "dispatcher" },
+        { label: "Analyst", value: "analyst" },
+        { label: "Technician", value: "technician" },
+        { label: "Administrator", value: "admin" },
+      ],
+    },
+    {
+      name: "reason",
+      type: "textarea",
+      label: language === "ko" ? "신청 사유" : "Reason / Justification",
+      placeholder:
+        language === "ko"
+          ? "업무 목적을 간략히 작성해 주십시오."
+          : "Describe operational clearance purpose...",
+      required: true,
+      rows: 2,
+    },
+  ];
+
+  const handleLoginFormChange = (name: string, value: unknown) => {
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegFormChange = (name: string, value: unknown) => {
+    setRegForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
 
-    const result = await login(loginEmail, loginRoleOverride);
+    const result = await login(loginForm.email, "admin");
     setIsLoading(false);
 
     if (!result.success) {
@@ -55,16 +127,14 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickRoleSelect = (role: RbacRole, email: string) => {
-    setLoginEmail(email);
-    setLoginRoleOverride(role);
-    setErrorMessage(null);
-  };
-
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!regName.trim() || !regEmail.trim() || !regReason.trim()) {
-      setErrorMessage(language === "ko" ? "모든 필수 항목을 입력해 주십시오." : "Please fill in all required fields.");
+    if (!regForm.name.trim() || !regForm.email.trim() || !regForm.reason.trim()) {
+      setErrorMessage(
+        language === "ko"
+          ? "모든 필수 항목을 입력해 주십시오."
+          : "Please fill in all required fields."
+      );
       return;
     }
 
@@ -72,20 +142,24 @@ export default function LoginPage() {
     setErrorMessage(null);
 
     const result = await requestAccess({
-      name: regName,
-      email: regEmail,
-      department: regDept,
-      requestedRole: regRole,
-      reason: regReason
+      name: regForm.name,
+      email: regForm.email,
+      department: regForm.department,
+      requestedRole: regForm.role,
+      reason: regForm.reason,
     });
 
     setIsLoading(false);
 
     if (result.success) {
       setRegSuccess(true);
-      setRegName("");
-      setRegEmail("");
-      setRegReason("");
+      setRegForm({
+        name: "",
+        email: "",
+        department: "Autonomous Mobility Fleet Division",
+        role: "dispatcher",
+        reason: "",
+      });
     } else {
       setErrorMessage(result.error || "Registration failed.");
     }
@@ -225,41 +299,13 @@ export default function LoginPage() {
 
             {/* MODE: LOGIN */}
             {mode === "login" && (
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-200 flex items-center justify-between">
-                    <span>{language === "ko" ? "사내 이메일" : "Email Address"}</span>
-                
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="operator@coreguard.io"
-                    className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-400 transition-colors"
-                  />
-                </div>
-
-                {/* Password */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-200">
-                    {language === "ko" ? "비밀번호" : "Password"}
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2.5 text-xs text-slate-100 outline-none focus:border-sky-400 transition-colors font-mono"
-                  />
-                </div>
-
-            
-     
-
+              <DynamicForm
+                fields={loginFields}
+                values={loginForm}
+                onChange={handleLoginFormChange}
+                onSubmit={handleLoginSubmit}
+                className="space-y-4"
+              >
                 {/* Submit Button */}
                 <button
                   type="submit"
@@ -277,7 +323,7 @@ export default function LoginPage() {
                       : (language === "ko" ? "보안 콘솔 로그인" : "Sign In to SOC Console")}
                   </span>
                 </button>
-              </form>
+              </DynamicForm>
             )}
 
             {/* MODE: REGISTER / REQUEST ACCESS */}
@@ -311,80 +357,13 @@ export default function LoginPage() {
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-200">
-                        {language === "ko" ? "성명" : "Full Name"} *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={regName}
-                        onChange={(e) => setRegName(e.target.value)}
-                        placeholder="e.g. Hye-Jin Lee"
-                        className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-400"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-200">
-                        {language === "ko" ? "사내 이메일" : "Email Address"} *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={regEmail}
-                        onChange={(e) => setRegEmail(e.target.value)}
-                        placeholder="operator@coreguard.io"
-                        className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-400"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-slate-200">
-                          {language === "ko" ? "부서" : "Department"}
-                        </label>
-                        <input
-                          type="text"
-                          value={regDept}
-                          onChange={(e) => setRegDept(e.target.value)}
-                          placeholder="Fleet Division"
-                          className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-400"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-slate-200">
-                          {language === "ko" ? "희망 역할" : "Role"}
-                        </label>
-                        <select
-                          value={regRole}
-                          onChange={(e) => setRegRole(e.target.value as RbacRole)}
-                          className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3 py-2 text-xs text-slate-100 font-medium outline-none focus:border-sky-400 cursor-pointer"
-                        >
-                          <option value="dispatcher">Dispatcher</option>
-                          <option value="analyst">Analyst</option>
-                          <option value="technician">Technician</option>
-                          <option value="admin">Administrator</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-200">
-                        {language === "ko" ? "신청 사유" : "Reason / Justification"} *
-                      </label>
-                      <textarea
-                        required
-                        rows={2}
-                        value={regReason}
-                        onChange={(e) => setRegReason(e.target.value)}
-                        placeholder={language === "ko" ? "업무 목적을 간략히 작성해 주십시오." : "Describe operational clearance purpose..."}
-                        className="w-full bg-[#080e1c] border border-slate-700/80 rounded-md px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-400 resize-none"
-                      />
-                    </div>
-
+                  <DynamicForm
+                    fields={registerFields}
+                    values={regForm}
+                    onChange={handleRegFormChange}
+                    onSubmit={handleRegisterSubmit}
+                    className="space-y-3.5"
+                  >
                     <button
                       type="submit"
                       disabled={isLoading}
@@ -399,7 +378,7 @@ export default function LoginPage() {
                         {language === "ko" ? "신청서 제출" : "Submit Access Request"}
                       </span>
                     </button>
-                  </form>
+                  </DynamicForm>
                 )}
               </div>
             )}

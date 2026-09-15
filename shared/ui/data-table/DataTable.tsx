@@ -18,9 +18,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-export interface DataTableProps<TData> {
+export interface DataTableProps<TData, TValue = unknown> {
   data: TData[];
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, TValue>[];
   selectedRowId?: string | null;
   getRowId?: (row: TData) => string;
   onRowClick?: (row: TData) => void;
@@ -31,7 +31,7 @@ export interface DataTableProps<TData> {
   className?: string;
 }
 
-export function DataTable<TData>({
+export function DataTable<TData, TValue = unknown>({
   data,
   columns,
   selectedRowId,
@@ -42,7 +42,7 @@ export function DataTable<TData>({
   initialPageSize = 10,
   emptyMessage = "No records found.",
   className = "",
-}: DataTableProps<TData>) {
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,

@@ -1,39 +1,76 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Fingerprint } from "lucide-react";
+import { ShieldCheck, Sun, Moon } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
 
 export default function AuthHeader() {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="p-6 border-b border-panel-border bg-zinc-900/30 flex items-start justify-between">
-      <div className="space-y-1">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-brand-cyan animate-ping" />
-          <span className="text-[10px] text-brand-cyan font-bold tracking-widest uppercase font-mono">
-            42dot CoreGuard SOC // AUTHENTICATION GATEWAY
-          </span>
+    <header className="h-14 border-b border-panel-border bg-[var(--panel-header-bg)]/80 backdrop-blur-md flex items-center justify-between px-6 z-10 font-mono">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-brand-cyan/15 border border-brand-cyan/30 flex items-center justify-center text-brand-cyan shadow-sm">
+          <ShieldCheck className="w-5 h-5 animate-pulse" />
         </div>
-        <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-brand-cyan" />
-          <span>{language === "ko" ? "보안 관제 센터 통합 인증" : "SOC Security Gateway"}</span>
-        </h1>
-        <p className="text-xs text-zinc-400">
-          {language === "ko"
-            ? "자율주행 차량 관제 콘솔 접근을 위해 운영자 자격을 증명하거나 가입을 신청하십시오."
-            : "Authenticate operator credentials or request clearance for autonomous vehicle fleet management."}
-        </p>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm tracking-tight text-[var(--foreground)]">
+              CoreGuard SOC
+            </span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30 font-bold">
+              ENTERPRISE
+            </span>
+          </div>
+          <p className="text-[10px] text-[var(--muted-text)] font-sans hidden sm:block">
+            Autonomous Mobility Cyber Defense & Safety Platform
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col items-end shrink-0 ml-4 font-mono">
-        <span className="text-[9px] px-2 py-0.5 rounded font-bold border border-brand-emerald/30 bg-brand-emerald/10 text-brand-emerald flex items-center gap-1">
-          <Fingerprint className="w-3 h-3" />
-          <span>KMS ENCRYPTED</span>
-        </span>
-        <span className="text-[9px] text-zinc-500 mt-1">v2.4.1 (HSM Level 3)</span>
+      {/* Right tools (Status, Language & Theme toggle) */}
+      <div className="flex items-center gap-2.5">
+        {/* System status pill */}
+        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px]">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>SYSTEMS ONLINE</span>
+        </div>
+
+        {/* Language Switcher */}
+        <div className="flex items-center rounded-lg border border-panel-border bg-[var(--input-bg)] p-0.5 text-xs font-medium">
+          <button
+            onClick={() => setLanguage("ko")}
+            className={`px-2 py-1 rounded-md transition-colors cursor-pointer ${
+              language === "ko"
+                ? "bg-brand-cyan/20 text-brand-cyan font-bold"
+                : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            한국어
+          </button>
+          <button
+            onClick={() => setLanguage("en")}
+            className={`px-2 py-1 rounded-md transition-colors cursor-pointer ${
+              language === "en"
+                ? "bg-brand-cyan/20 text-brand-cyan font-bold"
+                : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            EN
+          </button>
+        </div>
+
+        {/* Theme Switcher */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg border border-panel-border bg-[var(--input-bg)] text-[var(--muted-text)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-brand-cyan" />}
+        </button>
       </div>
-    </div>
+    </header>
   );
 }

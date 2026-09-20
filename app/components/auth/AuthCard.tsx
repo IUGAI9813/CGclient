@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertCircle, ChevronRight } from "lucide-react";
-import AuthHeader from "./AuthHeader";
+import { ShieldCheck, AlertCircle, X } from "lucide-react";
 import AuthTabs, { AuthMode } from "./AuthTabs";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
@@ -24,25 +23,42 @@ export default function AuthCard({ onClose, canClose = false }: AuthCardProps) {
   };
 
   return (
-    <div className="relative w-full max-w-xl bg-zinc-950 border border-panel-border rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col font-mono">
-      {/* Top Decorative Cyberpunk Scanline / Header */}
-      <div className="h-1 bg-gradient-to-r from-brand-cyan via-brand-emerald to-brand-cyan w-full" />
+    <div className="w-full max-w-md bg-[var(--panel-bg)] border border-panel-border rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col font-sans">
+      {/* Card Header */}
+      <div className="p-6 border-b border-panel-border bg-[var(--panel-header-bg)]/80 text-center relative">
+        <div className="w-12 h-12 rounded-xl bg-brand-cyan/15 border border-brand-cyan/30 text-brand-cyan flex items-center justify-center mx-auto mb-3 shadow-sm">
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <h1 className="text-lg font-bold text-[var(--foreground)] tracking-tight">
+          {language === "ko" ? "보안 관제 센터 인증" : "SOC Operator Authentication"}
+        </h1>
+        <p className="text-xs text-[var(--muted-text)] mt-1">
+          {language === "ko" 
+            ? "관제 권한 확인 및 자율주행 보안 콘솔 접속" 
+            : "Verify operational clearance for autonomous fleet telemetry"}
+        </p>
 
-      {/* Header */}
-      <AuthHeader />
+        {canClose && onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-[var(--muted-text)] hover:text-[var(--foreground)] hover:bg-[var(--panel-bg)] transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       {/* Tab Switcher */}
-      <AuthTabs mode={mode} onSelectMode={handleSelectMode} />
+      <div className="px-6 pt-4 bg-[var(--panel-header-bg)]/40 border-b border-panel-border">
+        <AuthTabs mode={mode} onSelectMode={handleSelectMode} />
+      </div>
 
-      {/* Body Content */}
-      <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+      {/* Card Body */}
+      <div className="p-6 space-y-4">
         {errorMessage && (
-          <div className="p-3 bg-brand-rose/10 border border-brand-rose/30 rounded text-xs text-brand-rose flex items-start gap-2 animate-fade-in">
+          <div className="p-3 bg-brand-rose/10 border border-brand-rose/20 rounded-md text-xs text-brand-rose flex items-start gap-2 animate-fade-in font-mono">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <span className="font-bold block uppercase text-[10px]">AUTH_SECURITY_DENIED</span>
-              <span>{errorMessage}</span>
-            </div>
+            <span>{errorMessage}</span>
           </div>
         )}
 
@@ -53,21 +69,6 @@ export default function AuthCard({ onClose, canClose = false }: AuthCardProps) {
             onReturnToLogin={() => handleSelectMode("login")}
             onError={setErrorMessage}
           />
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-panel-border bg-zinc-900/20 flex justify-between items-center text-[10px] text-zinc-500">
-        <span>Protected by 42dot Zero-Trust Security Gateway</span>
-        {canClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-zinc-400 hover:text-white flex items-center gap-1 font-bold cursor-pointer"
-          >
-            <span>{language === "ko" ? "닫기" : "Close"}</span>
-            <ChevronRight className="w-3 h-3" />
-          </button>
         )}
       </div>
     </div>

@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../AuthContext";
 import { useRbac, RbacRole } from "../RbacContext";
 import { useLanguage } from "../LanguageContext";
+import { useRouter } from "next/navigation";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface UserProfileModalProps {
 }
 
 export default function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
+  const router = useRouter();
   const { currentUser, logout } = useAuth();
   const { currentRole, setCurrentRole } = useRbac();
   const { language } = useLanguage();
@@ -31,6 +33,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   const handleLogout = () => {
     onClose();
     logout();
+    router.push("/login");
   };
 
   const getRoleLabel = (role: RbacRole) => {

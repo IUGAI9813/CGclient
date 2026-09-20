@@ -1,21 +1,9 @@
-"use client";
-
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import AuthHeader from "../components/auth/AuthHeader";
 import AuthCard from "../components/auth/AuthCard";
 import AuthFooter from "../components/auth/AuthFooter";
-import { useAuth } from "../components/AuthContext";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
 
   return (
     <div className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)] flex flex-col justify-between select-none relative overflow-x-hidden font-sans transition-colors duration-300">

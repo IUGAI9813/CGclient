@@ -176,6 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(true);
       setCurrentRole(updatedUser.role);
       localStorage.setItem("cg_auth_user", JSON.stringify(updatedUser));
+      localStorage.setItem("coreguard_jwt_token", `cg_jwt_${updatedUser.id}_${Date.now()}`);
       return { success: true };
     }
 
@@ -205,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(true);
     setCurrentRole(demoUser.role);
     localStorage.setItem("cg_auth_user", JSON.stringify(demoUser));
+    localStorage.setItem("coreguard_jwt_token", `cg_jwt_${demoUser.id}_${Date.now()}`);
     return { success: true };
   };
 
@@ -212,6 +214,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setCurrentUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("cg_auth_user");
+    localStorage.removeItem("coreguard_jwt_token");
   };
 
   const requestAccess = async (data: {

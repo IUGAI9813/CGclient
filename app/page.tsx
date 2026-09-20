@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
 import ConsoleLayout from "./components/ConsoleLayout";
 import DashboardView from "./components/views/DashboardView";
@@ -14,7 +15,6 @@ import ThresholdsView from "./components/views/ThresholdsView";
 import PoliciesView from "./components/views/PoliciesView";
 import { useRbac } from "./components/RbacContext";
 import { useAuth } from "./components/AuthContext";
-import LoginPage from "./components/views/LoginPage";
 
 interface Incident {
   id: string;
@@ -27,12 +27,20 @@ interface Incident {
 }
 
 export default function Home() {
+  const router = useRouter();
   const { isAuthenticated, isAuthLoading } = useAuth();
   const { canAccessTab, currentRole } = useRbac();
   const [activeTab, setActiveTab] = useState<string>("dashboard");
   const [threatLevel, setThreatLevel] = useState<"NORMAL" | "ELEVATED" | "CRITICAL">("ELEVATED");
   const [panicMode, setPanicMode] = useState<boolean>(false);
   const [selectedIncidentFromDashboard, setSelectedIncidentFromDashboard] = useState<Incident | null>(null);
+
+  // Strictly redirect unauthenticated users to /login route
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isAuthLoading, router]);
 
   // Initial Incidents State
   const [incidents, setIncidents] = useState<Incident[]>([
@@ -153,7 +161,7 @@ export default function Home() {
     }
   };
 
-  if (isAuthLoading) {
+  if (isAuthLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen bg-[var(--background)] flex items-center justify-center font-mono text-xs text-[var(--muted-text)]">
         <div className="flex items-center gap-2">
@@ -162,10 +170,6 @@ export default function Home() {
         </div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <LoginPage />;
   }
 
   return (

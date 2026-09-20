@@ -108,21 +108,6 @@ export default function LoginForm({ onError }: LoginFormProps) {
         )}
       </div>
 
-      {/* Session RBAC Role Override */}
-      <div className="space-y-1">
-        <label className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-          {language === "ko" ? "세션 역할 지정 (RBAC Clearance)" : "SESSION RBAC ROLE"}
-        </label>
-        <select
-          {...register("role")}
-          className="w-full bg-zinc-900 border border-panel-border rounded p-2.5 text-xs text-brand-cyan font-bold outline-none focus:border-brand-cyan cursor-pointer"
-        >
-          <option value="admin">SOC Administrator (전체 권한 / Full Security & RBAC)</option>
-          <option value="dispatcher">SOC Lead Dispatcher (플릿 관제 & E-Stop / Fleet Control)</option>
-          <option value="analyst">Security Analyst (CAN 분석 & 이상 탐지 / Threat Analysis)</option>
-          <option value="technician">Hangar Depot Tech (차량 센서 & OTA 보수 / Diagnostics)</option>
-        </select>
-      </div>
 
       {/* Submit Button */}
       <button

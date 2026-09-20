@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, TrendingUp, AlertTriangle, Radio, Zap, Compass } from "lucide-react";
+import { Shield, AlertTriangle, Radio, Car } from "lucide-react";
 import { Incident } from "@/entities/incident/model/types";
 import { useLanguage } from "@/app/components/LanguageContext";
 
@@ -10,137 +10,79 @@ interface DashboardKpiGridProps {
 }
 
 export function DashboardKpiGrid({ incidents, panicMode, onNavigateToTab }: DashboardKpiGridProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const activeAlertsCount = incidents.filter((i) => i.status === "ACTIVE").length;
+  const criticalCount = incidents.filter((i) => i.severity === "CRITICAL" && i.status === "ACTIVE").length;
+
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-      {/* KPI 1: Fleet Safety Score */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
-          SEC_INDEX_01
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-sans">
+      {/* 1. Fleet Safety */}
+      <div className="cyber-panel p-3.5 rounded-lg border border-panel-border flex flex-col justify-between">
+        <div className="flex items-center justify-between text-[var(--muted-text)]">
+          <span className="text-xs font-medium">{t("dashboard.score")}</span>
+          <Shield className={`w-4 h-4 ${panicMode ? "text-brand-rose" : "text-brand-emerald"}`} />
         </div>
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {t("dashboard.score")}
-            </span>
-            <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">
-              {panicMode ? "42.8%" : "98.4%"}
-            </span>
-          </div>
-          <div
-            className={`p-2 rounded bg-[var(--panel-header-bg)] border ${
-              panicMode ? "border-brand-rose text-brand-rose" : "border-brand-emerald text-brand-emerald"
-            }`}
-          >
-            <Shield className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-1.5 text-xs">
-          <TrendingUp
-            className={`w-3.5 h-3.5 ${panicMode ? "text-brand-rose rotate-180" : "text-brand-emerald"}`}
-          />
-          <span className={panicMode ? "text-brand-rose" : "text-brand-emerald"}>
-            {panicMode ? `-55.6% (${t("dashboard.critical")})` : `+0.4% ${t("dashboard.vs_last_hour")}`}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-xl font-bold text-[var(--foreground)] tracking-tight">
+            {panicMode ? "42.8%" : "98.4%"}
+          </span>
+          <span className={`text-[11px] font-medium ${panicMode ? "text-brand-rose" : "text-brand-emerald"}`}>
+            {panicMode ? "-55.6%" : "+0.4%"}
           </span>
         </div>
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-emerald to-transparent opacity-30" />
       </div>
 
-      {/* KPI 2: Active Alerts */}
+      {/* 2. Active Incidents */}
       <div
         onClick={() => onNavigateToTab("incidents")}
-        className="cyber-panel p-4 rounded relative overflow-hidden group cursor-pointer hover:border-zinc-700 transition-all"
+        className="cyber-panel p-3.5 rounded-lg border border-panel-border flex flex-col justify-between cursor-pointer hover:border-brand-cyan/40 transition-colors"
       >
-        <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
-          ALERT_CTR_02
+        <div className="flex items-center justify-between text-[var(--muted-text)]">
+          <span className="text-xs font-medium">{t("dashboard.alerts")}</span>
+          <AlertTriangle className={`w-4 h-4 ${activeAlertsCount > 0 ? "text-brand-rose" : "text-[var(--muted-text)]"}`} />
         </div>
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {t("dashboard.alerts")}
-            </span>
-            <span
-              className={`text-2xl font-bold tracking-tight block mt-1 ${
-                activeAlertsCount > 0 ? "text-brand-rose animate-pulse" : "text-[var(--foreground)]"
-              }`}
-            >
-              {activeAlertsCount}
-            </span>
-          </div>
-          <div
-            className={`p-2 rounded bg-[var(--panel-header-bg)] border ${
-              activeAlertsCount > 0
-                ? "border-brand-rose text-brand-rose animate-pulse"
-                : "border-panel-border text-zinc-400"
-            }`}
-          >
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-          <span className="text-zinc-500">{t("dashboard.unresolved")}</span>
-          <span className={`font-bold ${activeAlertsCount > 0 ? "text-brand-rose" : "text-zinc-300"}`}>
-            {incidents.filter((i) => i.severity === "CRITICAL" && i.status === "ACTIVE").length}{" "}
-            {t("dashboard.critical")}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className={`text-xl font-bold tracking-tight ${activeAlertsCount > 0 ? "text-brand-rose" : "text-[var(--foreground)]"}`}>
+            {activeAlertsCount}
+          </span>
+          <span className="text-[11px] text-[var(--muted-text)]">
+            {criticalCount} {t("dashboard.critical")}
           </span>
         </div>
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-rose to-transparent opacity-30" />
       </div>
 
-      {/* KPI 3: V2X Latency */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
-          NET_PING_03
+      {/* 3. V2X Latency */}
+      <div className="cyber-panel p-3.5 rounded-lg border border-panel-border flex flex-col justify-between">
+        <div className="flex items-center justify-between text-[var(--muted-text)]">
+          <span className="text-xs font-medium">{t("dashboard.latency")}</span>
+          <Radio className="w-4 h-4 text-brand-cyan" />
         </div>
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {t("dashboard.latency")}
-            </span>
-            <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">
-              14.2 ms
-            </span>
-          </div>
-          <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-brand-cyan">
-            <Radio className="w-5 h-5" />
-          </div>
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-xl font-bold text-[var(--foreground)] tracking-tight">
+            14.2 <span className="text-xs font-normal text-[var(--muted-text)]">ms</span>
+          </span>
+          <span className="text-[11px] text-brand-emerald font-medium">100 Hz</span>
         </div>
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-brand-emerald">
-          <Zap className="w-3.5 h-3.5" />
-          <span>{t("dashboard.telemetry_rate")}</span>
-        </div>
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-brand-cyan to-transparent opacity-30" />
       </div>
 
-      {/* KPI 4: Active Fleet Status */}
+      {/* 4. Active Fleet */}
       <div
         onClick={() => onNavigateToTab("fleet")}
-        className="cyber-panel p-4 rounded relative overflow-hidden group cursor-pointer hover:border-panel-border-hover transition-all"
+        className="cyber-panel p-3.5 rounded-lg border border-panel-border flex flex-col justify-between cursor-pointer hover:border-brand-cyan/40 transition-colors"
       >
-        <div className="absolute top-0 right-0 p-1 text-[9px] bg-[var(--panel-header-bg)] border-l border-b border-panel-border text-zinc-500">
-          FLT_STAT_04
+        <div className="flex items-center justify-between text-[var(--muted-text)]">
+          <span className="text-xs font-medium">{t("dashboard.fleet_service")}</span>
+          <Car className="w-4 h-4 text-[var(--muted-text)]" />
         </div>
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {t("dashboard.fleet_service")}
-            </span>
-            <span className="text-2xl font-bold text-[var(--foreground)] tracking-tight block mt-1">
-              148 / 150
-            </span>
-          </div>
-          <div className="p-2 rounded bg-[var(--panel-header-bg)] border border-panel-border text-zinc-400 group-hover:text-[var(--foreground)]">
-            <Compass className="w-5 h-5 animate-spin" style={{ animationDuration: "10s" }} />
-          </div>
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-xl font-bold text-[var(--foreground)] tracking-tight">
+            148 <span className="text-xs font-normal text-[var(--muted-text)]">/ 150</span>
+          </span>
+          <span className="text-[11px] text-[var(--muted-text)] font-medium">98.7% {language === "ko" ? "가동" : "active"}</span>
         </div>
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-          <span className="text-zinc-500">{t("dashboard.standby")}</span>
-          <span className="text-zinc-400 font-bold">{t("dashboard.hangar")}</span>
-        </div>
-        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-right from-zinc-500 to-transparent opacity-30" />
       </div>
     </div>
   );
 }
+

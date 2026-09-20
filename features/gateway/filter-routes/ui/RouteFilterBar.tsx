@@ -18,27 +18,27 @@ export const RouteFilterBar: React.FC<RouteFilterBarProps> = ({
   onCategoryChange,
 }) => {
   return (
-    <div className="cyber-panel p-3 rounded flex flex-col sm:flex-row items-center gap-3 justify-between bg-zinc-950/40">
-      <div className="relative w-full sm:w-72">
-        <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-zinc-500" />
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 justify-between font-sans">
+      <div className="relative flex-1 max-w-sm">
+        <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-[var(--muted-text)]" />
         <input
           type="text"
-          placeholder="Filter endpoints by URI or upstream..."
+          placeholder="Filter URI or upstream service..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full bg-zinc-900 border border-panel-border rounded pl-8 pr-3 py-1.5 text-xs text-white outline-none focus:border-brand-cyan"
+          className="w-full bg-[var(--input-bg)] border border-panel-border rounded-md pl-8.5 pr-3 py-1.5 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-text)] focus:border-brand-cyan outline-none transition-colors"
         />
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto w-full sm:w-auto">
+      <div className="flex items-center gap-1 bg-[var(--panel-header-bg)] p-1 rounded-md border border-panel-border overflow-x-auto scrollbar-none">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             onClick={() => onCategoryChange(cat)}
-            className={`px-2 py-1 text-[10px] font-bold rounded border transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 text-[11px] font-medium rounded whitespace-nowrap transition-colors cursor-pointer ${
               selectedCategory === cat
-                ? "bg-brand-cyan/20 border-brand-cyan text-brand-cyan"
-                : "bg-zinc-900 border-panel-border text-zinc-400 hover:text-white"
+                ? "bg-[var(--panel-bg)] text-brand-cyan font-semibold shadow-2xs"
+                : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
             }`}
           >
             {cat}
@@ -48,3 +48,4 @@ export const RouteFilterBar: React.FC<RouteFilterBarProps> = ({
     </div>
   );
 };
+

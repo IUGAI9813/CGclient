@@ -33,7 +33,7 @@ export default function GatewayView() {
   // Live sandbox tester state
   const [testMethod, setTestMethod] = useState<HttpMethod>("POST");
   const [testEndpoint, setTestEndpoint] = useState("/v1/fleet/control/emergency-stop");
-  const [testAuthHeader, setTestAuthHeader] = useState("Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.42dot...");
+  const [testAuthHeader, setTestAuthHeader] = useState("Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.coreguard...");
   const [testPayload, setTestPayload] = useState(
     JSON.stringify(
       {
@@ -113,7 +113,7 @@ export default function GatewayView() {
           headers: {
             "content-type": "application/json; charset=utf-8",
             "x-tyk-gateway": "tyk-k8s-ingress-node-02",
-            "x-auth-principal": "alex.s@42dot.ai",
+            "x-auth-principal": "alex.s@coreguard.io",
             "x-auth-roles": "SOC_ADMIN,DISPATCHER",
             "x-ratelimit-limit": "10000",
             "x-ratelimit-remaining": "9842",
@@ -136,9 +136,10 @@ export default function GatewayView() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in font-mono">
-      {/* Top API Gateway KPI Metrics Grid */}
+    <div className="space-y-4 animate-fade-in font-sans">
+      {/* Top API Gateway Header */}
       <GatewayKpiGrid stats={kpis} />
+
 
       {/* Sub-tab Navigation */}
       <GatewaySubNav

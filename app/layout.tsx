@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CoreGuard SOC Console | 42dot",
-  description: "Autonomous Vehicle Security Operations Center Command & Safety Management System",
+  title: "CoreGuard SOC Console | Autonomous Fleet Defense",
+  description: "Enterprise Autonomous Mobility Cybersecurity & Fleet Dispatch Operations Center Command & Safety Management System",
 };
 
 export default function RootLayout({

@@ -1,5 +1,4 @@
 import React from "react";
-import { Layers, Sliders, Server, Play } from "lucide-react";
 
 export type GatewaySubTab = "routes" | "ratelimit" | "upstream" | "tester";
 
@@ -14,39 +13,34 @@ export const GatewaySubNav: React.FC<GatewaySubNavProps> = ({
   onTabChange,
   routesCount,
 }) => {
+  const tabs: { key: GatewaySubTab; label: string; count?: number }[] = [
+    { key: "routes", label: "Routes", count: routesCount },
+    { key: "ratelimit", label: "Rate Limits" },
+    { key: "upstream", label: "Service Mesh" },
+    { key: "tester", label: "Request Tester" },
+  ];
+
   return (
-    <div className="gateway-tab-bar">
-      <button
-        onClick={() => onTabChange("routes")}
-        className={`gateway-tab-btn ${activeTab === "routes" ? "active" : ""}`}
-      >
-        <Layers className="w-4 h-4 text-brand-cyan" />
-        <span>Route Registry & Governance ({routesCount})</span>
-      </button>
-
-      <button
-        onClick={() => onTabChange("ratelimit")}
-        className={`gateway-tab-btn ${activeTab === "ratelimit" ? "active" : ""}`}
-      >
-        <Sliders className="w-4 h-4 text-brand-cyan" />
-        <span>Rate Limiting & Traffic Policies</span>
-      </button>
-
-      <button
-        onClick={() => onTabChange("upstream")}
-        className={`gateway-tab-btn ${activeTab === "upstream" ? "active" : ""}`}
-      >
-        <Server className="w-4 h-4 text-brand-cyan" />
-        <span>Service Mesh & Circuit Breakers</span>
-      </button>
-
-      <button
-        onClick={() => onTabChange("tester")}
-        className={`gateway-tab-btn ${activeTab === "tester" ? "active" : ""}`}
-      >
-        <Play className="w-4 h-4 text-brand-cyan" />
-        <span>Interactive Gateway Request Tester</span>
-      </button>
+    <div className="flex items-center gap-1 bg-[var(--panel-header-bg)] p-1 rounded-md border border-panel-border overflow-x-auto scrollbar-none font-sans">
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          onClick={() => onTabChange(tab.key)}
+          className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
+            activeTab === tab.key
+              ? "bg-[var(--panel-bg)] text-brand-cyan font-semibold shadow-2xs"
+              : "text-[var(--muted-text)] hover:text-[var(--foreground)]"
+          }`}
+        >
+          <span>{tab.label}</span>
+          {tab.count !== undefined && (
+            <span className="text-[10px] text-[var(--muted-text)] font-mono">
+              ({tab.count})
+            </span>
+          )}
+        </button>
+      ))}
     </div>
   );
 };
+

@@ -24,6 +24,7 @@ import { useRbac, RbacRole, allNavTabIds } from "./RbacContext";
 import { useAuth } from "./AuthContext";
 import { useTheme } from "./ThemeContext";
 import LogoutConfirmModal from "./auth/LogoutConfirmModal";
+import UserProfileModal from "./views/UserProfileModal";
 import { useRouter } from "next/navigation";
 
 interface ConsoleLayoutProps {
@@ -53,6 +54,7 @@ export default function ConsoleLayout({
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
   const [utcTime, setUtcTime] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("Seoul - Gangnam SOC");
@@ -128,7 +130,7 @@ export default function ConsoleLayout({
                     <h1 className="text-sm font-bold tracking-wider text-white">COREGUARD</h1>
                   </div>
                   <span className="text-[10px] text-zinc-500 font-mono tracking-widest block mt-0.5">
-                    {t("layout.subtitle")}
+                    {/* {t("layout.subtitle")} */}
                   </span>
                 </div>
               ) : (
@@ -190,27 +192,23 @@ export default function ConsoleLayout({
             {!sidebarCollapsed ? (
               <div className="p-3 border-b border-panel-border flex items-center justify-between gap-2 font-mono">
                 <div 
-                  className="w-8 h-8 rounded-full bg-[var(--panel-header-bg)] border border-panel-border flex items-center justify-center text-xs font-bold text-brand-cyan shadow-inner shrink-0 cursor-pointer hover:border-brand-cyan"
-                  onClick={() => setShowLogoutConfirm(true)}
-                  title={language === "ko" ? "세션 종료 / 로그아웃" : "Active Operator Session (Click to Sign Out)"}
+                  className="w-8 h-8 rounded-full bg-[var(--panel-header-bg)] border border-panel-border flex items-center justify-center text-xs font-bold text-brand-cyan shadow-inner shrink-0 cursor-pointer hover:border-brand-cyan transition-colors"
+                  onClick={() => setShowUserModal(true)}
+                  title={language === "ko" ? "운영자 프로필 보기" : "Open Operator Profile"}
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
-                <div className="flex flex-col flex-1 min-w-0">
+                <div 
+                  className="flex flex-col flex-1 min-w-0 cursor-pointer hover:opacity-85 transition-opacity"
+                  onClick={() => setShowUserModal(true)}
+                  title={language === "ko" ? "운영자 프로필 보기" : "Open Operator Profile"}
+                >
                   <span className="text-xs font-bold text-[var(--foreground)] truncate" title={currentUser?.email}>
                     {currentUser?.name || "Alex S."}
                   </span>
-                  <select
-                    value={currentRole}
-                    onChange={(e) => setCurrentRole(e.target.value as RbacRole)}
-                    className="bg-[var(--input-bg)] border border-panel-border rounded text-[9px] text-brand-cyan font-bold uppercase tracking-wider py-0.5 px-1 mt-0.5 outline-none cursor-pointer focus:border-brand-cyan"
-                    title="Switch Active Operator Role to test RBAC restrictions"
-                  >
-                    <option value="admin">SOC Admin</option>
-                    <option value="dispatcher">Lead Dispatcher</option>
-                    <option value="analyst">Security Analyst</option>
-                    <option value="technician">Hangar Tech</option>
-                  </select>
+                  <span className="text-[9px] text-brand-cyan font-bold uppercase tracking-wider mt-0.5">
+                    {currentRole === "admin" ? "SOC Admin" : currentRole === "dispatcher" ? "Lead Dispatcher" : currentRole === "analyst" ? "Security Analyst" : "Hangar Tech"}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -224,9 +222,9 @@ export default function ConsoleLayout({
             ) : (
               <div className="p-2 border-b border-panel-border flex justify-center">
                 <div 
-                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer hover:border-brand-cyan"
-                  title={`Active Role: ${currentRole.toUpperCase()} (Click to Sign Out)`}
-                  onClick={() => setShowLogoutConfirm(true)}
+                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer hover:border-brand-cyan transition-colors"
+                  title={`Active Role: ${currentRole.toUpperCase()} (Click for Profile)`}
+                  onClick={() => setShowUserModal(true)}
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
@@ -404,6 +402,14 @@ export default function ConsoleLayout({
           </footer>
         </div>
       </div>
+
+      {/* Operator Profile & Session Modal */}
+      {showUserModal && (
+        <UserProfileModal
+          isOpen={showUserModal}
+          onClose={() => setShowUserModal(false)}
+        />
+      )}
 
       {/* Operator Session Termination Confirmation Dialog */}
       <LogoutConfirmModal

@@ -57,7 +57,7 @@ export default function AuditView() {
       id: "LOG-239120",
       time: "22:58:14",
       level: "SECURITY",
-      actor: "alex.s@42dot.ai",
+      actor: "alex.s@coreguard.io",
       action: "Dispatcher Console Login Successful",
       source: "10.42.9.11",
       hash: "8d3e712ca7a022f",
@@ -93,7 +93,7 @@ export default function AuditView() {
       id: "LOG-239116",
       time: "22:50:33",
       level: "SECURITY",
-      actor: "maria.k@42dot.ai",
+      actor: "maria.k@coreguard.io",
       action: "Remote Speed Restriction Policy Modified",
       source: "10.42.9.18",
       hash: "3bc882daef21004",
@@ -243,7 +243,7 @@ export default function AuditView() {
                       &bull; {language === "ko" ? "서명 검증 완료" : "Signature Verified"}
                     </div>
                     <div className="space-y-0.5 text-[8px]">
-                      <div>KMS KEY: 42dot-HSM-09</div>
+                      <div>KMS KEY: CG-HSM-09</div>
                       <div>ALGO: ECDSA_SHA_256</div>
                       <div className="break-all text-zinc-500">
                         FULL: {log.hash}ef3a82dc77ea102ab23d8c112b

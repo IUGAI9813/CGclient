@@ -86,7 +86,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: true,
-    updatedBy: "secops.lead@42dot.ai",
+    updatedBy: "secops.lead@coreguard.io",
     updatedAt: "2026-09-08 14:20:00",
   },
   {
@@ -113,7 +113,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: true,
-    updatedBy: "dispatcher.alex@42dot.ai",
+    updatedBy: "dispatcher.alex@coreguard.io",
     updatedAt: "2026-09-08 16:45:10",
   },
   {
@@ -140,7 +140,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: "06:00",
     endTime: "23:00",
     isActive: true,
-    updatedBy: "fleet.ops@42dot.ai",
+    updatedBy: "fleet.ops@coreguard.io",
     updatedAt: "2026-09-07 09:15:00",
   },
   {
@@ -167,7 +167,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: true,
-    updatedBy: "logistics.guard@42dot.ai",
+    updatedBy: "logistics.guard@coreguard.io",
     updatedAt: "2026-09-06 18:00:22",
   },
   {
@@ -225,7 +225,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: "23:00",
     endTime: "05:30",
     isActive: true,
-    updatedBy: "scheduler@42dot.ai",
+    updatedBy: "scheduler@coreguard.io",
     updatedAt: "2026-09-09 02:00:00",
   },
   {
@@ -283,7 +283,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: false,
-    updatedBy: "architect@42dot.ai",
+    updatedBy: "architect@coreguard.io",
     updatedAt: "2026-05-01 10:00:00",
   },
   {
@@ -310,7 +310,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: false,
-    updatedBy: "battery.engineer@42dot.ai",
+    updatedBy: "battery.engineer@coreguard.io",
     updatedAt: "2026-07-20 11:00:00",
   },
   {
@@ -337,7 +337,7 @@ export const defaultThresholdRules: ThresholdRule[] = [
     startTime: null,
     endTime: null,
     isActive: false,
-    updatedBy: "dispatcher.alex@42dot.ai",
+    updatedBy: "dispatcher.alex@coreguard.io",
     updatedAt: "2026-03-01 09:00:00",
   },
 ];

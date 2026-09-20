@@ -27,8 +27,8 @@ export interface PendingApproval {
 
 const defaultUsers: SocUser[] = [
   {
-    id: "usr-42-001",
-    email: "admin@42dot.ai",
+    id: "usr-cg-001",
+    email: "admin@coreguard.io",
     name: "Alex S. (Lead Admin)",
     role: "admin",
     department: "SOC Cyber Defense & Safety Operations",
@@ -37,8 +37,8 @@ const defaultUsers: SocUser[] = [
     createdAt: "2026-01-10"
   },
   {
-    id: "usr-42-014",
-    email: "sarah.k@42dot.ai",
+    id: "usr-cg-014",
+    email: "sarah.k@coreguard.io",
     name: "Sarah Kim",
     role: "dispatcher",
     department: "Gangnam Fleet Dispatch Center",
@@ -47,8 +47,8 @@ const defaultUsers: SocUser[] = [
     createdAt: "2026-02-04"
   },
   {
-    id: "usr-42-029",
-    email: "minjun.p@42dot.ai",
+    id: "usr-cg-029",
+    email: "minjun.p@coreguard.io",
     name: "Min-Jun Park",
     role: "analyst",
     department: "Threat Intelligence & Anomaly Response",
@@ -57,8 +57,8 @@ const defaultUsers: SocUser[] = [
     createdAt: "2026-03-12"
   },
   {
-    id: "usr-42-077",
-    email: "david.c@42dot.ai",
+    id: "usr-cg-077",
+    email: "david.c@coreguard.io",
     name: "David Cho",
     role: "technician",
     department: "Hangar Service Depot (Pangyo)",
@@ -71,7 +71,7 @@ const defaultUsers: SocUser[] = [
 const defaultPending: PendingApproval[] = [
   {
     id: "req-2026-091",
-    email: "hyejin.lee@42dot.ai",
+    email: "hyejin.lee@coreguard.io",
     name: "Hye-Jin Lee",
     department: "Autonomous Mobility Operations",
     requestedRole: "dispatcher",
@@ -94,6 +94,7 @@ const defaultPending: PendingApproval[] = [
 export interface AuthContextType {
   currentUser: SocUser | null;
   isAuthenticated: boolean;
+  isAuthLoading: boolean;
   users: SocUser[];
   pendingApprovals: PendingApproval[];
   login: (email: string, role?: RbacRole) => Promise<{ success: boolean; error?: string }>;
@@ -116,8 +117,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setCurrentRole } = useRbac();
-  const [currentUser, setCurrentUser] = useState<SocUser | null>(defaultUsers[0]);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [currentUser, setCurrentUser] = useState<SocUser | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<SocUser[]>(defaultUsers);
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>(defaultPending);
 
@@ -127,28 +129,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const savedUsers = localStorage.getItem("cg_auth_users_list");
       const savedPending = localStorage.getItem("cg_auth_pending_list");
 
-      queueMicrotask(() => {
-        if (savedUsers) {
-          try {
-            setUsers(JSON.parse(savedUsers));
-          } catch {}
-        }
-        if (savedPending) {
-          try {
-            setPendingApprovals(JSON.parse(savedPending));
-          } catch {}
-        }
-        if (savedAuth) {
-          try {
-            const user = JSON.parse(savedAuth) as SocUser;
+      if (savedUsers) {
+        try {
+          setUsers(JSON.parse(savedUsers));
+        } catch {}
+      }
+      if (savedPending) {
+        try {
+          setPendingApprovals(JSON.parse(savedPending));
+        } catch {}
+      }
+      if (savedAuth) {
+        try {
+          const user = JSON.parse(savedAuth) as SocUser;
+          if (user && user.id) {
             setCurrentUser(user);
             setIsAuthenticated(true);
             setCurrentRole(user.role);
-          } catch {}
-        }
-      });
+          }
+        } catch {}
+      }
     } catch {
       // Ignore parse errors, keep initial defaults
+    } finally {
+      setIsAuthLoading(false);
     }
   }, [setCurrentRole]);
 
@@ -304,6 +308,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentUser,
         isAuthenticated,
+        isAuthLoading,
         users,
         pendingApprovals,
         login,

@@ -1,5 +1,4 @@
 import React from "react";
-import { Users, UserCheck, KeyRound, Lock } from "lucide-react";
 import { useLanguage } from "@/app/components/LanguageContext";
 import { SocUser, PendingApproval } from "@/app/components/AuthContext";
 
@@ -13,96 +12,27 @@ export function IamKpiGrid({ users, pendingApprovals }: IamKpiGridProps) {
   const activeUsersCount = users.filter((u) => u.status === "ACTIVE").length;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* Card 1: Registered Operators */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {language === "ko" ? "인가 운영자 총원" : "Authorized Personnel"}
-            </span>
-            <span className="text-xl font-bold text-white tracking-tight block mt-1">
-              {users.length} {language === "ko" ? "명" : "Active"}
-            </span>
-          </div>
-          <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-cyan">
-            <Users className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-zinc-400 flex items-center justify-between">
-          <span>{language === "ko" ? "정상 인가 상태:" : "Status:"}</span>
-          <span className="text-brand-emerald font-bold">{activeUsersCount} ACTIVE</span>
-        </div>
-      </div>
-
-      {/* Card 2: Pending Approvals Queue */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              {language === "ko" ? "가입 심사 대기열" : "Pending Sign-Offs"}
-            </span>
-            <span
-              className={`text-xl font-bold tracking-tight block mt-1 ${
-                pendingApprovals.length > 0 ? "text-amber-400 animate-pulse" : "text-white"
-              }`}
-            >
-              {pendingApprovals.length} {language === "ko" ? "건" : "Requests"}
-            </span>
-          </div>
-          <div className="p-2 rounded bg-zinc-900 border border-panel-border text-amber-400">
-            <UserCheck className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-zinc-400 flex items-center justify-between">
-          <span>{language === "ko" ? "관리자 서명 필요:" : "Action Required:"}</span>
-          <span className={pendingApprovals.length > 0 ? "text-amber-400 font-bold" : "text-zinc-500"}>
-            {pendingApprovals.length > 0 ? "REVIEW REQUIRED" : "CLEAR"}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-1 font-sans">
+      <div className="flex items-center gap-3">
+        <h1 className="text-base font-bold text-[var(--foreground)] tracking-tight">
+          {language === "ko" ? "인증 및 권한 관리 (IAM)" : "Identity & Access Management"}
+        </h1>
+        <div className="flex items-center gap-2 text-xs font-mono text-[var(--muted-text)]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[var(--panel-header-bg)] border border-panel-border text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-emerald" />
+            <span>{activeUsersCount}/{users.length} {language === "ko" ? "운영자 활성" : "Active"}</span>
           </span>
-        </div>
-      </div>
-
-      {/* Card 3: IdP Engine */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              Identity Provider (IdP)
+          {pendingApprovals.length > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-semibold">
+              {pendingApprovals.length} {language === "ko" ? "건 승인 대기" : "Pending"}
             </span>
-            <span className="text-xl font-bold text-brand-cyan tracking-tight block mt-1">
-              42dot OIDC Engine
-            </span>
-          </div>
-          <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-cyan">
-            <KeyRound className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-zinc-400 flex items-center justify-between">
-          <span>Compliance:</span>
-          <span className="text-brand-emerald font-bold">OAuth 2.1 / OIDC</span>
-        </div>
-      </div>
-
-      {/* Card 4: Revocation Endpoint */}
-      <div className="cyber-panel p-4 rounded relative overflow-hidden">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">
-              Fleet PKI Endpoint
-            </span>
-            <span className="text-xl font-bold text-brand-emerald tracking-tight block mt-1">
-              OCSP / CRL Synced
-            </span>
-          </div>
-          <div className="p-2 rounded bg-zinc-900 border border-panel-border text-brand-emerald">
-            <Lock className="w-5 h-5" />
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-zinc-400 flex items-center justify-between">
-          <span>mTLS CA:</span>
-          <span className="text-zinc-300 font-bold">42dot Fleet G3</span>
+          )}
+          <span className="hidden md:inline text-[11px] text-[var(--muted-text)]">
+            &bull; OAuth 2.1 &bull; mTLS PKI
+          </span>
         </div>
       </div>
     </div>
   );
 }
+

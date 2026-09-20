@@ -23,7 +23,8 @@ import { useLanguage } from "./LanguageContext";
 import { useRbac, RbacRole, allNavTabIds } from "./RbacContext";
 import { useAuth } from "./AuthContext";
 import { useTheme } from "./ThemeContext";
-import AuthModal from "./views/AuthModal";
+import LogoutConfirmModal from "./auth/LogoutConfirmModal";
+import { useRouter } from "next/navigation";
 
 interface ConsoleLayoutProps {
   activeTab: string;
@@ -46,15 +47,23 @@ export default function ConsoleLayout({
   children,
   incidentCount
 }: ConsoleLayoutProps) {
+  const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   const { currentRole, setCurrentRole, canAccessTab } = useRbac();
   const { currentUser, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
   const [utcTime, setUtcTime] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("Seoul - Gangnam SOC");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // If unauthenticated, redirect to /login route
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -182,8 +191,8 @@ export default function ConsoleLayout({
               <div className="p-3 border-b border-panel-border flex items-center justify-between gap-2 font-mono">
                 <div 
                   className="w-8 h-8 rounded-full bg-[var(--panel-header-bg)] border border-panel-border flex items-center justify-center text-xs font-bold text-brand-cyan shadow-inner shrink-0 cursor-pointer hover:border-brand-cyan"
-                  onClick={() => setShowAuthModal(true)}
-                  title="Switch Account / Sign In"
+                  onClick={() => setShowLogoutConfirm(true)}
+                  title={language === "ko" ? "세션 종료 / 로그아웃" : "Active Operator Session (Click to Sign Out)"}
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
@@ -205,10 +214,7 @@ export default function ConsoleLayout({
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    logout();
-                    setShowAuthModal(true);
-                  }}
+                  onClick={() => setShowLogoutConfirm(true)}
                   title={language === "ko" ? "로그아웃" : "Sign Out"}
                   className="p-1.5 text-zinc-500 hover:text-brand-rose hover:bg-brand-rose/10 rounded border border-transparent hover:border-brand-rose/30 transition-all cursor-pointer"
                 >
@@ -218,9 +224,9 @@ export default function ConsoleLayout({
             ) : (
               <div className="p-2 border-b border-panel-border flex justify-center">
                 <div 
-                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer"
-                  title={`Active Role: ${currentRole.toUpperCase()}`}
-                  onClick={() => setShowAuthModal(true)}
+                  className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-brand-cyan shadow-inner cursor-pointer hover:border-brand-cyan"
+                  title={`Active Role: ${currentRole.toUpperCase()} (Click to Sign Out)`}
+                  onClick={() => setShowLogoutConfirm(true)}
                 >
                   {currentRole === "admin" ? "SA" : currentRole === "dispatcher" ? "LD" : currentRole === "analyst" ? "AN" : "TC"}
                 </div>
@@ -399,11 +405,16 @@ export default function ConsoleLayout({
         </div>
       </div>
 
-      {/* Authentication Gateway Modal */}
-      <AuthModal
-        isOpen={!isAuthenticated || showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        canClose={isAuthenticated}
+      {/* Operator Session Termination Confirmation Dialog */}
+      <LogoutConfirmModal
+        isOpen={showLogoutConfirm}
+        currentUser={currentUser}
+        onConfirm={() => {
+          logout();
+          setShowLogoutConfirm(false);
+          router.push("/login");
+        }}
+        onCancel={() => setShowLogoutConfirm(false)}
       />
     </div>
   );
